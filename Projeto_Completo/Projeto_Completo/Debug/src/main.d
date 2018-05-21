@@ -113,19 +113,22 @@ src/main.d src/main.o: ../src/main.c ../src/asf.h \
  ../src/ASF/common/utils/interrupt.h \
  ../src/ASF/common/utils/interrupt/interrupt_sam_nvic.h \
  ../src/ASF/sam/utils/status_codes.h \
- ../src/ASF/common/services/gpio/gpio.h \
- ../src/ASF/common/services/gpio/sam_gpio/sam_gpio.h \
- ../src/ASF/sam/drivers/pio/pio.h ../src/ASF/common/boards/board.h \
- ../src/ASF/sam/boards/sam4s_ek2/sam4s_ek2.h \
- ../src/ASF/sam/utils/cmsis/sam4s/include/system_sam4s.h \
- ../src/ASF/common/services/ioport/ioport.h \
- ../src/ASF/common/services/ioport/sam/ioport_pio.h \
+ ../src/ASF/common/services/delay/delay.h \
  ../src/ASF/common/services/clock/sysclk.h ../src/config/conf_clock.h \
  ../src/ASF/common/services/clock/sam4s/sysclk.h \
  ../src/ASF/common/services/clock/osc.h \
  ../src/ASF/common/services/clock/sam4s/osc.h \
+ ../src/ASF/common/boards/board.h \
+ ../src/ASF/sam/boards/sam4s_ek2/sam4s_ek2.h \
+ ../src/ASF/sam/utils/cmsis/sam4s/include/system_sam4s.h \
  ../src/ASF/sam/drivers/pmc/pmc.h ../src/ASF/common/services/clock/pll.h \
  ../src/ASF/common/services/clock/sam4s/pll.h \
+ ../src/ASF/common/services/delay/sam/cycle_counter.h \
+ ../src/ASF/common/services/gpio/gpio.h \
+ ../src/ASF/common/services/gpio/sam_gpio/sam_gpio.h \
+ ../src/ASF/sam/drivers/pio/pio.h \
+ ../src/ASF/common/services/ioport/ioport.h \
+ ../src/ASF/common/services/ioport/sam/ioport_pio.h \
  ../src/ASF/sam/drivers/pmc/sleep.h ../src/ASF/sam/boards/sam4s_ek2/led.h \
  ../src/ASF/common/utils/stdio/stdio_serial/stdio_serial.h \
  ../src/ASF/common/services/serial/serial.h \
@@ -364,21 +367,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 
 ../src/ASF/sam/utils/status_codes.h:
 
-../src/ASF/common/services/gpio/gpio.h:
-
-../src/ASF/common/services/gpio/sam_gpio/sam_gpio.h:
-
-../src/ASF/sam/drivers/pio/pio.h:
-
-../src/ASF/common/boards/board.h:
-
-../src/ASF/sam/boards/sam4s_ek2/sam4s_ek2.h:
-
-../src/ASF/sam/utils/cmsis/sam4s/include/system_sam4s.h:
-
-../src/ASF/common/services/ioport/ioport.h:
-
-../src/ASF/common/services/ioport/sam/ioport_pio.h:
+../src/ASF/common/services/delay/delay.h:
 
 ../src/ASF/common/services/clock/sysclk.h:
 
@@ -390,11 +379,29 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 
 ../src/ASF/common/services/clock/sam4s/osc.h:
 
+../src/ASF/common/boards/board.h:
+
+../src/ASF/sam/boards/sam4s_ek2/sam4s_ek2.h:
+
+../src/ASF/sam/utils/cmsis/sam4s/include/system_sam4s.h:
+
 ../src/ASF/sam/drivers/pmc/pmc.h:
 
 ../src/ASF/common/services/clock/pll.h:
 
 ../src/ASF/common/services/clock/sam4s/pll.h:
+
+../src/ASF/common/services/delay/sam/cycle_counter.h:
+
+../src/ASF/common/services/gpio/gpio.h:
+
+../src/ASF/common/services/gpio/sam_gpio/sam_gpio.h:
+
+../src/ASF/sam/drivers/pio/pio.h:
+
+../src/ASF/common/services/ioport/ioport.h:
+
+../src/ASF/common/services/ioport/sam/ioport_pio.h:
 
 ../src/ASF/sam/drivers/pmc/sleep.h:
 

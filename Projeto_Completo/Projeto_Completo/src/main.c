@@ -56,6 +56,7 @@ void TC_Handler(void)
 
 void configuracoes_gerais()
 {
+	char buffer[255];
 	puts("Insira tempo maximo no escuro em horas:\r");
 	scanf("%i", &escuro);
 	escuro *= 3600;
@@ -63,13 +64,21 @@ void configuracoes_gerais()
 	scanf("%f", &luz_min);
 	luz_min /= 100.0;
 	puts("Configuracao completa!\r");
+	sprintf(buffer,"Tempo: %i\tLuz: %f\n\r", escuro, luz_min);
+	puts(buffer);
 }
 
 int main (void)
 {
 	sysclk_init();
 	board_init();
-	tc_config(1);
 	inicializacao_UART();
-	configuracoes_gerais();
+	tc_config(1);
+//configuracoes_gerais();
+
+	while(1)
+	{
+		puts("TESTE\r");
+		delay_s(1);
+	}
 }
