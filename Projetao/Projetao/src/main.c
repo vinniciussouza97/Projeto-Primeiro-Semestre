@@ -22,8 +22,14 @@
 #define MAX_DIGITAL     (4095)
 #define ADC_CHANNEL 5
 
-int		escuro;
-float	luz_min;
+#define PIO_HUM	PIOA
+#define PINO_HUM	PIO_PA14
+
+#define TEMPO_MAX_ESCURO	10
+
+int	escuro_max = TEMPO_MAX_ESCURO;
+int	escuro = TEMPO_MAX_ESCURO;
+int	luz_min = 50;
 
 void inicializacao_UART (){
 	
@@ -81,11 +87,21 @@ void ADC_Handler(void)
 	{
 		result = adc_get_latest_value(ADC);
 		
+		//exibição do último valor
 		char buffer[10];
 		sprintf (buffer, "%d", result);
-		
 		puts(buffer);
 		puts("\r");
+		
+		//lógica de tempo para acender lâmpada
+		if (result <= (4095*100/luz_min))
+			escuro--;
+		else
+			escuro = escuro_max;
+		if (escuro <= 0)
+			pio_clear(PIOA, PINO_LED_VERDE);
+		else
+			pio_set(PIOA, PINO_LED_VERDE);
 	}
 }
 
@@ -95,11 +111,11 @@ void configuracoes_gerais()
 	puts("Insira tempo maximo no escuro em horas:\r");
 	scanf("%i", &escuro);
 	escuro *= 3600;
-	puts("Insira a luminosidade minima em %:\r");
-	scanf("%f", &luz_min);
+	puts("Insira a luminosidade minima em \%:\r");
+	scanf("%i", &luz_min);
 	luz_min /= 100.0;
 	puts("Configuracao completa!\r");
-	sprintf(buffer,"Tempo: %i\tLuz: %f\n\r", escuro, luz_min);
+	sprintf(buffer,"Tempo: %i\tLuz: %i\%\n\r", escuro, luz_min);
 	puts(buffer);
 }
 
@@ -117,13 +133,31 @@ void configure_adc(void)
 	adc_enable_interrupt(ADC, ADC_IER_DRDY);
 }
 
+static void hum_handle(uint32_t id, uint32_t mask)
+{
+	//iniciar bomba
+	pio_clear(PIOA, PINO_LED_VERDE);
+}
+
+void configure_botao(void)
+{
+	pmc_enable_periph_clk(ID_PIOB);
+	
+	pio_set_input(PIO_HUM, PINO_HUM, PIN_PUSHBUTTON_1_ATTR);
+	pio_set_debounce_filter(PIO_HUM, PINO_HUM, 10);
+	pio_handler_set(PIO_HUM, ID_PIOA, PINO_HUM, PIN_PUSHBUTTON_1_ATTR ,hum_handle);
+	pio_enable_interrupt(PIO_HUM, PINO_HUM);
+	NVIC_SetPriority(PIOA_IRQn, 5);
+	NVIC_EnableIRQ(PIOA_IRQn);
+}
+
 int main (void)
 {
 	sysclk_init();
 	board_init();
 	inicializacao_UART();
 	configure_adc();
-	tc_config(10);
+	tc_config(1);
 	
 	pio_set_output(PIOA, PINO_LED_AZUL, HIGH, DISABLE, ENABLE);
 	pio_set_output(PIOA, PINO_LED_VERDE, HIGH, DISABLE, ENABLE);
