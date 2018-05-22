@@ -56,9 +56,6 @@
 #include <compiler.h>
 #include <status_codes.h>
 
-// From module: Delay routines
-#include <delay.h>
-
 // From module: GPIO - General purpose Input/Output
 #include <gpio.h>
 
@@ -84,16 +81,8 @@
 // From module: SAM4S-EK2 LED support enabled
 #include <led.h>
 
-// From module: SPI - SAM Implementation
-#include <spi_master.h>
-#include <spi_master.h>
-
 // From module: SPI - Serial Peripheral Interface
 #include <spi.h>
-
-// From module: SSD1306 OLED controller
-#include <font.h>
-#include <ssd1306.h>
 
 // From module: System Clock Control - SAM4S implementation
 #include <sysclk.h>

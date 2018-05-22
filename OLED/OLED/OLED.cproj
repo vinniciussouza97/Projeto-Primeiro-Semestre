@@ -30,7 +30,6 @@
       <framework-data>
   <options>
     <option id="common.boards" value="Add" config="" content-id="Atmel.ASF" />
-    <option id="common.components.display.ssd1306" value="Add" config="" content-id="Atmel.ASF" />
     <option id="common.services.basic.gpio" value="Add" config="" content-id="Atmel.ASF" />
     <option id="common.services.ioport" value="Add" config="" content-id="Atmel.ASF" />
     <option id="sam.drivers.pio" value="Add" config="" content-id="Atmel.ASF" />
@@ -197,18 +196,6 @@
     <file path="src/ASF/thirdparty/CMSIS/Lib/license.txt" framework="" version="" source="thirdparty/CMSIS/Lib/license.txt" changed="False" content-id="Atmel.ASF" />
     <file path="src/ASF/thirdparty/CMSIS/README.txt" framework="" version="" source="thirdparty/CMSIS/README.txt" changed="False" content-id="Atmel.ASF" />
     <file path="src/ASF/thirdparty/CMSIS/license.txt" framework="" version="" source="thirdparty/CMSIS/license.txt" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/components/display/ssd1306/font.c" framework="" version="3.32.0" source="common\components\display\ssd1306\font.c" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/components/display/ssd1306/ssd1306.c" framework="" version="3.32.0" source="common\components\display\ssd1306\ssd1306.c" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/components/display/ssd1306/font.h" framework="" version="3.32.0" source="common\components\display\ssd1306\font.h" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/components/display/ssd1306/ssd1306.h" framework="" version="3.32.0" source="common\components\display\ssd1306\ssd1306.h" changed="False" content-id="Atmel.ASF" />
-    <file path="src/Config/conf_ssd1306.h" framework="" version="3.32.0" source="common\components\display\ssd1306\module_config\conf_ssd1306.h" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/services/delay/sam/cycle_counter.c" framework="" version="3.32.0" source="common\services\delay\sam\cycle_counter.c" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/services/delay/sam/cycle_counter.h" framework="" version="3.32.0" source="common\services\delay\sam\cycle_counter.h" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/services/delay/delay.h" framework="" version="3.32.0" source="common\services\delay\delay.h" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/services/spi/sam_spi/spi_master.c" framework="" version="3.32.0" source="common\services\spi\sam_spi\spi_master.c" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/services/spi/sam_spi/spi_master.h" framework="" version="3.32.0" source="common\services\spi\sam_spi\spi_master.h" changed="False" content-id="Atmel.ASF" />
-    <file path="src/ASF/common/services/spi/spi_master.h" framework="" version="3.32.0" source="common\services\spi\spi_master.h" changed="False" content-id="Atmel.ASF" />
-    <file path="src/Config/conf_spi_master.h" framework="" version="3.32.0" source="common\services\spi\sam_spi\module_config\conf_spi_master.h" changed="False" content-id="Atmel.ASF" />
     <file path="src/ASF/sam/drivers/spi/spi.c" framework="" version="3.32.0" source="sam\drivers\spi\spi.c" changed="False" content-id="Atmel.ASF" />
     <file path="src/ASF/sam/drivers/spi/spi.h" framework="" version="3.32.0" source="sam\drivers\spi\spi.h" changed="False" content-id="Atmel.ASF" />
   </files>
@@ -221,6 +208,8 @@
   <board id="board.sam4s_ek2" value="Add" config="" content-id="Atmel.ASF" />
 </framework-data>
     </AsfFrameworkConfig>
+    <ResetRule>0</ResetRule>
+    <EraseKey />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -259,10 +248,6 @@
       <Value>../src/ASF/sam/drivers/pio</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
-      <Value>../src/ASF/common/components/display/ssd1306</Value>
-      <Value>../src/ASF/common/services/delay</Value>
-      <Value>../src/ASF/common/services/spi/sam_spi</Value>
-      <Value>../src/ASF/common/services/spi</Value>
       <Value>../src/ASF/sam/drivers/spi</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
@@ -303,10 +288,6 @@
       <Value>../src/ASF/sam/drivers/pio</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
-      <Value>../src/ASF/common/components/display/ssd1306</Value>
-      <Value>../src/ASF/common/services/delay</Value>
-      <Value>../src/ASF/common/services/spi/sam_spi</Value>
-      <Value>../src/ASF/common/services/spi</Value>
       <Value>../src/ASF/sam/drivers/spi</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
@@ -330,10 +311,6 @@
       <Value>../src/ASF/sam/drivers/pio</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
-      <Value>../src/ASF/common/components/display/ssd1306</Value>
-      <Value>../src/ASF/common/services/delay</Value>
-      <Value>../src/ASF/common/services/spi/sam_spi</Value>
-      <Value>../src/ASF/common/services/spi</Value>
       <Value>../src/ASF/sam/drivers/spi</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
@@ -377,10 +354,6 @@
       <Value>../src/ASF/sam/drivers/pio</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
-      <Value>../src/ASF/common/components/display/ssd1306</Value>
-      <Value>../src/ASF/common/services/delay</Value>
-      <Value>../src/ASF/common/services/spi/sam_spi</Value>
-      <Value>../src/ASF/common/services/spi</Value>
       <Value>../src/ASF/sam/drivers/spi</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
@@ -422,10 +395,6 @@
       <Value>../src/ASF/sam/drivers/pio</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
-      <Value>../src/ASF/common/components/display/ssd1306</Value>
-      <Value>../src/ASF/common/services/delay</Value>
-      <Value>../src/ASF/common/services/spi/sam_spi</Value>
-      <Value>../src/ASF/common/services/spi</Value>
       <Value>../src/ASF/sam/drivers/spi</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
@@ -450,10 +419,6 @@
       <Value>../src/ASF/sam/drivers/pio</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
-      <Value>../src/ASF/common/components/display/ssd1306</Value>
-      <Value>../src/ASF/common/services/delay</Value>
-      <Value>../src/ASF/common/services/spi/sam_spi</Value>
-      <Value>../src/ASF/common/services/spi</Value>
       <Value>../src/ASF/sam/drivers/spi</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
@@ -516,48 +481,12 @@
     <Folder Include="src\config\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\ASF\common\components\display\ssd1306\font.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\ASF\common\services\spi\sam_spi\spi_master.c">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="src\ASF\sam\drivers\spi\spi.c">
       <SubType>compile</SubType>
     </Compile>
     <None Include="src\ASF\sam\drivers\spi\spi.h">
       <SubType>compile</SubType>
     </None>
-    <None Include="src\config\conf_spi_master.h">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="src\ASF\common\services\spi\spi_master.h">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="src\ASF\common\services\spi\sam_spi\spi_master.h">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="src\ASF\common\services\delay\delay.h">
-      <SubType>compile</SubType>
-    </None>
-    <Compile Include="src\ASF\common\services\delay\sam\cycle_counter.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <None Include="src\ASF\common\services\delay\sam\cycle_counter.h">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="src\config\conf_ssd1306.h">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="src\ASF\common\components\display\ssd1306\ssd1306.h">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="src\ASF\common\components\display\ssd1306\font.h">
-      <SubType>compile</SubType>
-    </None>
-    <Compile Include="src\ASF\common\components\display\ssd1306\ssd1306.c">
-      <SubType>compile</SubType>
-    </Compile>
     <None Include="src\asf.h">
       <SubType>compile</SubType>
     </None>

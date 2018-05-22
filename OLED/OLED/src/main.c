@@ -1,76 +1,43 @@
 #include <asf.h>
 #include <string.h>
 
+// Master
+#define SPI_MASTER_BASE	SPI
+#define SPI_CHIP_SEL	0
+#define SPI_CHIP_PCS	spi_get_pcs(SPI_CHIP_SEL)
+#define SPI_CLK_POLARITY	0
+#define SPI_CLK_PHASE	0
+/* Delay before SPCK. */
+#define SPI_DLYBS	0x40
+/* Delay between consecutive transfers. */
+#define SPI_DLYBCT	0x10
+/* SPI clock setting (Hz). */
+static uint32_t gs_ul_spi_clock = 500000;
+
+static void spi_master_initialize(void)
+{
+	puts("-I- Initialize SPI as master\r");
+
+	/* Configure an SPI peripheral. */
+	spi_enable_clock(SPI_MASTER_BASE);
+	spi_disable(SPI_MASTER_BASE);
+	spi_reset(SPI_MASTER_BASE);
+	spi_set_lastxfer(SPI_MASTER_BASE);
+	spi_set_master_mode(SPI_MASTER_BASE);
+	spi_disable_mode_fault_detect(SPI_MASTER_BASE);
+	spi_set_peripheral_chip_select_value(SPI_MASTER_BASE, SPI_CHIP_PCS);
+	spi_set_clock_polarity(SPI_MASTER_BASE, SPI_CHIP_SEL, SPI_CLK_POLARITY);
+	spi_set_clock_phase(SPI_MASTER_BASE, SPI_CHIP_SEL, SPI_CLK_PHASE);
+	spi_set_bits_per_transfer(SPI_MASTER_BASE, SPI_CHIP_SEL,
+	SPI_CSR_BITS_8_BIT);
+	spi_set_baudrate_div(SPI_MASTER_BASE, SPI_CHIP_SEL,	(sysclk_get_peripheral_hz()	/ gs_ul_spi_clock));
+	spi_set_transfer_delay(SPI_MASTER_BASE, SPI_CHIP_SEL, SPI_DLYBS, SPI_DLYBCT);
+	spi_enable(SPI_MASTER_BASE);
+}
+
 int main(void)
 {
-
 	sysclk_init();
 	board_init();
-
-	// Initialize SPI and SSD1306 controller.
-	ssd1306_init();
-
-	
-	while(1){
-		// Clear screen.
-		ssd1306_clear();
-		
-		//Set line and column to 0
-		ssd1306_set_page_address(0);
-		ssd1306_set_column_address(0);
-		
-		/// -------- First Screen --------
-		ssd1306_write_text("Coffee consumption improves");
-		
-		delay_ms(1500);
-		
-		ssd1306_set_page_address(1);
-		ssd1306_set_column_address(8);
-		
-		ssd1306_write_text("programming performance");
-		
-		delay_ms(1500);
-		
-		ssd1306_set_page_address(2);
-		ssd1306_set_column_address(20);
-		
-		ssd1306_write_text("when coding in C.");
-		
-		delay_ms(1500);
-		
-
-
-		/// -------- Second Screen --------
-		ssd1306_clear();
-		ssd1306_set_page_address(0);
-		ssd1306_set_column_address(0);
-		
-		uint8_t text[65];
-		uint8_t* pText = text;
-		uint8_t *char_ptr;
-		uint8_t i=0, column=0, page=0;
-		
-		//use sprintf to create strings from numbers, variables and other strings
-		sprintf(text, "When coding in Java, however, performance decreases in %f %%", 73.37);
-
-		//print text character by character
-		while(*pText){
-			//write a single character
-			char_ptr = font_table[*pText++ - 32];
-			for (i = 1; i <= char_ptr[0]; i++) {
-				ssd1306_write_data(char_ptr[i]);
-			}
-			
-			//newline
-			if(column++ == 35){
-				column = 0;
-				page++;
-				ssd1306_set_column_address(column);
-				ssd1306_set_page_address(page);
-			}
-			
-			//wait
-			delay_ms(100);
-		}
-	}
+	spi_master_initialize();
 }
