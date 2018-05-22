@@ -5,6 +5,7 @@
 #define CONF_UART_CHAR_LENGTH  US_MR_CHRL_8_BIT
 #define CONF_UART_PARITY       US_MR_PAR_NO
 #define CONF_UART_STOP_BITS    US_MR_NBSTOP_1_BIT
+
 #define	PINO_LED_AZUL	PIO_PA19
 #define PINO_LED_VERDE	PIO_PA20
 
@@ -13,6 +14,16 @@
 #define ID_TC		ID_TC0
 #define TC_Handler  TC0_Handler
 #define TC_IRQn     TC0_IRQn
+
+#define VOLT_REF        (3300)
+#define TRACKING_TIME    15
+#define TRANSFER_PERIOD  2
+#define STARTUP_TIME	ADC_STARTUP_TIME_4
+#define MAX_DIGITAL     (4095)
+#define ADC_CHANNEL 5
+
+int		escuro;
+float	luz_min;
 
 void inicializacao_UART (){
 	
@@ -59,6 +70,51 @@ void TC_Handler(void)
 {
 	tc_get_status(TC,CHANNEL);
 	LED_Toggle(LED0_GPIO);
+	adc_start(ADC);
+}
+
+void ADC_Handler(void)
+{
+	uint16_t result;
+
+	if ((adc_get_status(ADC) & ADC_ISR_DRDY) == ADC_ISR_DRDY)
+	{
+		result = adc_get_latest_value(ADC);
+		
+		char buffer[10];
+		sprintf (buffer, "%d", result);
+		
+		puts(buffer);
+		puts("\r");
+	}
+}
+
+void configuracoes_gerais()
+{
+	char buffer[255];
+	puts("Insira tempo maximo no escuro em horas:\r");
+	scanf("%i", &escuro);
+	escuro *= 3600;
+	puts("Insira a luminosidade minima em %:\r");
+	scanf("%f", &luz_min);
+	luz_min /= 100.0;
+	puts("Configuracao completa!\r");
+	sprintf(buffer,"Tempo: %i\tLuz: %f\n\r", escuro, luz_min);
+	puts(buffer);
+}
+
+void configure_adc(void)
+{
+	/* Enable peripheral clock. */
+	pmc_enable_periph_clk(ID_ADC);
+	
+	adc_init(ADC, sysclk_get_cpu_hz(), 6400000, STARTUP_TIME);
+	adc_configure_timing(ADC, TRACKING_TIME	, ADC_SETTLING_TIME_3, TRANSFER_PERIOD);
+	adc_configure_trigger(ADC, ADC_TRIG_SW, 0);
+	adc_enable_channel(ADC, ADC_CHANNEL);
+	NVIC_SetPriority(ADC_IRQn, 5);
+	NVIC_EnableIRQ(ADC_IRQn);
+	adc_enable_interrupt(ADC, ADC_IER_DRDY);
 }
 
 int main (void)
@@ -66,12 +122,14 @@ int main (void)
 	sysclk_init();
 	board_init();
 	inicializacao_UART();
+	configure_adc();
 	tc_config(10);
 	
 	pio_set_output(PIOA, PINO_LED_AZUL, HIGH, DISABLE, ENABLE);
 	pio_set_output(PIOA, PINO_LED_VERDE, HIGH, DISABLE, ENABLE);
 
 	menu();
+//	configuracoes_gerais();
 
 	while(1)
 	{

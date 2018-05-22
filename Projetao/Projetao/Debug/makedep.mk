@@ -4,6 +4,12 @@
 
 src\ASF\common\utils\stdio\read.c
 
+src\ASF\sam\drivers\adc\adc.c
+
+src\ASF\sam\drivers\adc\adc_sam3u.c
+
+src\ASF\sam\drivers\ebi\smc\smc.c
+
 src\ASF\sam\drivers\tc\tc.c
 
 src\ASF\sam\drivers\usart\usart.c

@@ -52,6 +52,9 @@
  * running the ASF driver selector tool. Any changes will be discarded.
  */
 
+// From module: ADC - Analog-to-digital Converter
+#include <adc.h>
+
 // From module: Common SAM compiler driver
 #include <compiler.h>
 #include <status_codes.h>
@@ -80,6 +83,9 @@
 
 // From module: SAM4S-EK2 LED support enabled
 #include <led.h>
+
+// From module: SMC - Static Memory Controller
+#include <smc.h>
 
 // From module: Standard serial I/O (stdio) - SAM implementation
 #include <stdio_serial.h>
