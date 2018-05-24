@@ -1,4 +1,7 @@
 #include <asf.h>
+#include "stdio_serial.h"
+#include "conf_board.h"
+#include "conf_clock.h"
 
 #define CONF_UART              UART0
 #define CONF_UART_BAUDRATE     9600
@@ -23,20 +26,24 @@
 #define ADC_CHANNEL 5
 
 #define PWM_FREQUENCY	1000	/** PWM frequency in Hz */
-#define PERIOD_VALUE	100	/** Period value of PWM output waveform */
-#define INIT_DUTY_VALUE	100	/** Initial duty cycle value */
-#define PWM_CHANNEL_BOMBA	0	//Canal PWM da bomba. Pinos PA0, PA11, PA23, PB0, PC18
+#define PERIOD_VALUE	4096	/** Period value of PWM output waveform */
+#define INIT_DUTY_VALUE	4000	/** Initial duty cycle value */
+#define PWM_CHANNEL_BOMBA	2	//Canal PWM da bomba
+#define PWM_CHANNEL_BOMBA_EN	PWM_ENA_CHID2	//Enable do canal. Ultimo digito = canal
+#define PIN_BOMBA	PIO_PDR_P13	//Pino da bomba
+#define PIN_BOMBA_ABCDSR	PIO_ABCDSR_P13
+#define PIO_BOMBA	PIOA
 
 #define PIO_HUM	PIOA
 #define PINO_HUM	PIO_PA14
 
 #define TEMPO_MAX_ESCURO	10
 
-int	escuro_max = TEMPO_MAX_ESCURO;
-int	escuro = TEMPO_MAX_ESCURO;
-int	luz_min = 50;
-
-pwm_channel_t g_pwm_channel_bomba;
+uint32_t	escuro_max = TEMPO_MAX_ESCURO;
+uint32_t	escuro = TEMPO_MAX_ESCURO;
+uint32_t	luz_min = 50;	//Luz minima em %
+uint32_t	duty_cycle = INIT_DUTY_VALUE;
+uint32_t	max_aceso = 10;	//Tempo maximo com a luz acesa
 
 void inicializacao_UART (){
 	
@@ -70,20 +77,16 @@ static void tc_config(uint32_t freq_desejada)
 	tc_start(TC, CHANNEL);
 }
 
-void menu()
-{
-	printf("\n\r");
-	puts("a: Acender LED azul\r");
-	puts("s: Apagar LED azul\r");
-	puts("v: Acender LED verde\r");
-	puts("b: Apagar LED verde\r");
-}
-
 void TC_Handler(void)
 {
 	tc_get_status(TC,CHANNEL);
 	LED_Toggle(LED0_GPIO);
 	adc_start(ADC);
+	//if (duty_cycle == INIT_DUTY_VALUE)
+		//duty_cycle = 1000;
+	//else
+		//duty_cycle = INIT_DUTY_VALUE;
+	//PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
 }
 
 void ADC_Handler(void)
@@ -105,10 +108,15 @@ void ADC_Handler(void)
 			escuro--;
 		else
 			escuro = escuro_max;
-		//if (escuro <= 0)
-			//pio_clear(PIOA, PINO_LED_VERDE);
-		//else
-			//pio_set(PIOA, PINO_LED_VERDE);
+		sprintf (buffer, "%d", escuro);
+		puts(buffer);
+		puts("\r");
+		if (escuro <= -max_aceso)
+			pio_set(PIOA, PINO_LED_VERDE);
+		else if (escuro <= 0)
+			pio_clear(PIOA, PINO_LED_VERDE);
+		else
+			pio_set(PIOA, PINO_LED_VERDE);
 	}
 }
 
@@ -116,11 +124,11 @@ void configuracoes_gerais()
 {
 	char buffer[255];
 	puts("Insira tempo maximo no escuro em horas:\r");
-	scanf("%i", &escuro);
-	escuro *= 3600;
+	escuro_max = getchar();
+	escuro_max *= 3600;
 	puts("Insira a luminosidade minima em \%:\r");
-	scanf("%i", &luz_min);
-	luz_min /= 100.0;
+	luz_min = getchar();
+	luz_min *= 10;
 	puts("Configuracao completa!\r");
 	sprintf(buffer,"Tempo: %i\tLuz: %i\%\n\r", escuro, luz_min);
 	puts(buffer);
@@ -140,73 +148,23 @@ void configure_adc(void)
 	adc_enable_interrupt(ADC, ADC_IER_DRDY);
 }
 
-static void hum_handle(uint32_t id, uint32_t mask)
-{
-	//iniciar bomba
-	pio_clear(PIOA, PINO_LED_VERDE);
-}
-
-void configure_hum(void)
-{
-	pmc_enable_periph_clk(ID_PIOB);
-	
-	pio_set_input(PIO_HUM, PINO_HUM, PIN_PUSHBUTTON_1_ATTR);
-	pio_set_debounce_filter(PIO_HUM, PINO_HUM, 10);
-	pio_handler_set(PIO_HUM, ID_PIOA, PINO_HUM, PIN_PUSHBUTTON_1_ATTR ,hum_handle);
-	pio_enable_interrupt(PIO_HUM, PINO_HUM);
-	NVIC_SetPriority(PIOA_IRQn, 5);
-	NVIC_EnableIRQ(PIOA_IRQn);
-}
-
 void configure_pwm(void)
 {
-	pmc_enable_periph_clk(ID_PWM);
-	pwm_channel_disable(PWM, PWM_CHANNEL_BOMBA);
-
-	/* Set PWM clock A as PWM_FREQUENCY*PERIOD_VALUE (clock B is not used) */
-	pwm_clock_t clock_setting = {
-		.ul_clka = PWM_FREQUENCY * PERIOD_VALUE,
-		.ul_clkb = 0,
-		.ul_mck = sysclk_get_cpu_hz()
-	};
-
-	pwm_init(PWM, &clock_setting);
-
-	/* Initialize PWM channel for LED0 */
-	/* Period is left-aligned */
-	g_pwm_channel_bomba.alignment = PWM_ALIGN_LEFT;
-	/* Output waveform starts at a low level */
-	g_pwm_channel_bomba.polarity = PWM_LOW;
-	/* Use PWM clock A as source clock */
-	g_pwm_channel_bomba.ul_prescaler = PWM_CMR_CPRE_CLKA;
-	/* Period value of output waveform */
-	g_pwm_channel_bomba.ul_period = PERIOD_VALUE;
-	/* Duty cycle value of output waveform */
-	g_pwm_channel_bomba.ul_duty = INIT_DUTY_VALUE;
-	g_pwm_channel_bomba.channel = PWM_CHANNEL_BOMBA;
-
-	pwm_channel_init(PWM, &g_pwm_channel_bomba);
-
-	/* Enable channel counter event interrupt */
-	pwm_channel_enable_interrupt(PWM, PWM_CHANNEL_BOMBA, 0);
-
-	/* Configure interrupt and enable PWM interrupt */
-	NVIC_DisableIRQ(PWM_IRQn);
-	NVIC_ClearPendingIRQ(PWM_IRQn);
-	NVIC_SetPriority(PWM_IRQn, 0);
-	NVIC_EnableIRQ(PWM_IRQn);
-	
-	/* Enable PWM channels for LEDs */
-	pwm_channel_enable(PWM, PWM_CHANNEL_BOMBA);
-	
-	pwm_channel_update_duty(PWM, &g_pwm_channel_bomba, INIT_DUTY_VALUE);
-	
-	puts("PWM");
-}
-
-void PWM_Handler(void)
-{
-	uint32_t events = pwm_channel_get_interrupt_status(PWM);
+	// disable the PIO (peripheral controls the pin)
+	PIO_BOMBA->PIO_PDR = PIN_BOMBA;
+	// select alternate function B (PWML0) for pin PA19
+	PIO_BOMBA->PIO_ABCDSR[0] |= PIN_BOMBA_ABCDSR;
+	PIO_BOMBA->PIO_ABCDSR[1] &= ~PIN_BOMBA_ABCDSR;
+	// Enable the PWM peripheral from the Power Manger
+	PMC->PMC_PCER0 = (1 << ID_PWM);
+	// Select the Clock to run at the MCK (4MHz)
+	PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CMR = PWM_CMR_CPRE_MCK;
+	// select the period 10msec
+	PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CPRD = PERIOD_VALUE;// freq em khz
+	// select the duty cycle
+	PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTY = INIT_DUTY_VALUE;
+	// enable the channel
+	PWM->PWM_ENA = PWM_CHANNEL_BOMBA_EN;
 }
 
 int main (void)
@@ -214,7 +172,6 @@ int main (void)
 	sysclk_init();
 	board_init();
 	inicializacao_UART();
-	configure_hum();
 	configure_adc();
 	configure_pwm();
 	tc_config(1);
@@ -222,7 +179,6 @@ int main (void)
 	pio_set_output(PIOA, PINO_LED_AZUL, HIGH, DISABLE, ENABLE);
 	pio_set_output(PIOA, PINO_LED_VERDE, HIGH, DISABLE, ENABLE);
 
-	menu();
 //	configuracoes_gerais();
 
 	while(1)
