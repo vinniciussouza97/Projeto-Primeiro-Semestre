@@ -36,10 +36,11 @@
           <option id="common.services.ioport" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.services.basic.serial" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.utils.stdio.stdio_serial" value="Add" config="" content-id="Atmel.ASF" />
-          <option id="sam.drivers.pio" value="Add" config="" content-id="Atmel.ASF" />
-          <option id="sam.drivers.tc" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam.drivers.adc" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam.drivers.smc" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="sam.drivers.pio" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="sam.drivers.tc" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="sam.drivers.pwm" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.applications.user_application" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam.utils.cmsis.sam4s.source.template" value="Add" config="" content-id="Atmel.ASF" />
         </options>
@@ -219,6 +220,8 @@
           <file path="src/ASF/sam/drivers/adc/adc_sam3u.c" framework="" version="3.35.1" source="sam\drivers\adc\adc_sam3u.c" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/sam/drivers/adc/adc.c" framework="" version="3.35.1" source="sam\drivers\adc\adc.c" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/sam/drivers/adc/adc.h" framework="" version="3.35.1" source="sam\drivers\adc\adc.h" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam/drivers/pwm/pwm.c" framework="" version="3.35.1" source="sam\drivers\pwm\pwm.c" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam/drivers/pwm/pwm.h" framework="" version="3.35.1" source="sam\drivers\pwm\pwm.h" changed="False" content-id="Atmel.ASF" />
         </files>
         <documentation help="http://asf.atmel.com/docs/3.35.1/common.applications.user_application.sam4s_ek2/html/index.html" />
         <offline-documentation help="" />
@@ -275,6 +278,7 @@
       <Value>../src/ASF/sam/drivers/tc</Value>
       <Value>../src/ASF/sam/drivers/ebi/smc</Value>
       <Value>../src/ASF/sam/drivers/adc</Value>
+      <Value>../src/ASF/sam/drivers/pwm</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
@@ -322,6 +326,7 @@
       <Value>../src/ASF/sam/drivers/tc</Value>
       <Value>../src/ASF/sam/drivers/ebi/smc</Value>
       <Value>../src/ASF/sam/drivers/adc</Value>
+      <Value>../src/ASF/sam/drivers/pwm</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM4=true -DBOARD=SAM4S_EK2 -D__SAM4SD32C__ -Dprintf=iprintf -Dscanf=iscanf</armgcc.preprocessingassembler.general.AssemblerFlags>
@@ -352,6 +357,7 @@
       <Value>../src/ASF/sam/drivers/tc</Value>
       <Value>../src/ASF/sam/drivers/ebi/smc</Value>
       <Value>../src/ASF/sam/drivers/adc</Value>
+      <Value>../src/ASF/sam/drivers/pwm</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
 </ArmGcc>
@@ -402,6 +408,7 @@
       <Value>../src/ASF/sam/drivers/tc</Value>
       <Value>../src/ASF/sam/drivers/ebi/smc</Value>
       <Value>../src/ASF/sam/drivers/adc</Value>
+      <Value>../src/ASF/sam/drivers/pwm</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
@@ -450,6 +457,7 @@
       <Value>../src/ASF/sam/drivers/tc</Value>
       <Value>../src/ASF/sam/drivers/ebi/smc</Value>
       <Value>../src/ASF/sam/drivers/adc</Value>
+      <Value>../src/ASF/sam/drivers/pwm</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.assembler.debugging.DebugLevel>Default (-g)</armgcc.assembler.debugging.DebugLevel>
@@ -481,6 +489,7 @@
       <Value>../src/ASF/sam/drivers/tc</Value>
       <Value>../src/ASF/sam/drivers/ebi/smc</Value>
       <Value>../src/ASF/sam/drivers/adc</Value>
+      <Value>../src/ASF/sam/drivers/pwm</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
   <armgcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcc.preprocessingassembler.debugging.DebugLevel>
@@ -514,6 +523,7 @@
     <Folder Include="src\ASF\sam\drivers\ebi\smc\" />
     <Folder Include="src\ASF\sam\drivers\pio\" />
     <Folder Include="src\ASF\sam\drivers\pmc\" />
+    <Folder Include="src\ASF\sam\drivers\pwm\" />
     <Folder Include="src\ASF\sam\drivers\tc\" />
     <Folder Include="src\ASF\sam\drivers\uart\" />
     <Folder Include="src\ASF\sam\drivers\usart\" />
@@ -560,6 +570,12 @@
       <SubType>compile</SubType>
     </Compile>
     <None Include="src\ASF\sam\drivers\ebi\smc\smc.h">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\ASF\sam\drivers\pwm\pwm.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\sam\drivers\pwm\pwm.h">
       <SubType>compile</SubType>
     </None>
     <Compile Include="src\ASF\sam\drivers\tc\tc.c">

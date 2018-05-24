@@ -22,6 +22,11 @@
 #define MAX_DIGITAL     (4095)
 #define ADC_CHANNEL 5
 
+#define PWM_FREQUENCY	1000	/** PWM frequency in Hz */
+#define PERIOD_VALUE	100	/** Period value of PWM output waveform */
+#define INIT_DUTY_VALUE	100	/** Initial duty cycle value */
+#define PWM_CHANNEL_BOMBA	0	//Canal PWM da bomba. Pinos PA0, PA11, PA23, PB0, PC18
+
 #define PIO_HUM	PIOA
 #define PINO_HUM	PIO_PA14
 
@@ -30,6 +35,8 @@
 int	escuro_max = TEMPO_MAX_ESCURO;
 int	escuro = TEMPO_MAX_ESCURO;
 int	luz_min = 50;
+
+pwm_channel_t g_pwm_channel_bomba;
 
 void inicializacao_UART (){
 	
@@ -94,14 +101,14 @@ void ADC_Handler(void)
 		puts("\r");
 		
 		//lógica de tempo para acender lâmpada
-		if (result <= (4095*100/luz_min))
+		if (result <= (4095*luz_min/100))
 			escuro--;
 		else
 			escuro = escuro_max;
-		if (escuro <= 0)
-			pio_clear(PIOA, PINO_LED_VERDE);
-		else
-			pio_set(PIOA, PINO_LED_VERDE);
+		//if (escuro <= 0)
+			//pio_clear(PIOA, PINO_LED_VERDE);
+		//else
+			//pio_set(PIOA, PINO_LED_VERDE);
 	}
 }
 
@@ -139,7 +146,7 @@ static void hum_handle(uint32_t id, uint32_t mask)
 	pio_clear(PIOA, PINO_LED_VERDE);
 }
 
-void configure_botao(void)
+void configure_hum(void)
 {
 	pmc_enable_periph_clk(ID_PIOB);
 	
@@ -151,12 +158,65 @@ void configure_botao(void)
 	NVIC_EnableIRQ(PIOA_IRQn);
 }
 
+void configure_pwm(void)
+{
+	pmc_enable_periph_clk(ID_PWM);
+	pwm_channel_disable(PWM, PWM_CHANNEL_BOMBA);
+
+	/* Set PWM clock A as PWM_FREQUENCY*PERIOD_VALUE (clock B is not used) */
+	pwm_clock_t clock_setting = {
+		.ul_clka = PWM_FREQUENCY * PERIOD_VALUE,
+		.ul_clkb = 0,
+		.ul_mck = sysclk_get_cpu_hz()
+	};
+
+	pwm_init(PWM, &clock_setting);
+
+	/* Initialize PWM channel for LED0 */
+	/* Period is left-aligned */
+	g_pwm_channel_bomba.alignment = PWM_ALIGN_LEFT;
+	/* Output waveform starts at a low level */
+	g_pwm_channel_bomba.polarity = PWM_LOW;
+	/* Use PWM clock A as source clock */
+	g_pwm_channel_bomba.ul_prescaler = PWM_CMR_CPRE_CLKA;
+	/* Period value of output waveform */
+	g_pwm_channel_bomba.ul_period = PERIOD_VALUE;
+	/* Duty cycle value of output waveform */
+	g_pwm_channel_bomba.ul_duty = INIT_DUTY_VALUE;
+	g_pwm_channel_bomba.channel = PWM_CHANNEL_BOMBA;
+
+	pwm_channel_init(PWM, &g_pwm_channel_bomba);
+
+	/* Enable channel counter event interrupt */
+	pwm_channel_enable_interrupt(PWM, PWM_CHANNEL_BOMBA, 0);
+
+	/* Configure interrupt and enable PWM interrupt */
+	NVIC_DisableIRQ(PWM_IRQn);
+	NVIC_ClearPendingIRQ(PWM_IRQn);
+	NVIC_SetPriority(PWM_IRQn, 0);
+	NVIC_EnableIRQ(PWM_IRQn);
+	
+	/* Enable PWM channels for LEDs */
+	pwm_channel_enable(PWM, PWM_CHANNEL_BOMBA);
+	
+	pwm_channel_update_duty(PWM, &g_pwm_channel_bomba, INIT_DUTY_VALUE);
+	
+	puts("PWM");
+}
+
+void PWM_Handler(void)
+{
+	uint32_t events = pwm_channel_get_interrupt_status(PWM);
+}
+
 int main (void)
 {
 	sysclk_init();
 	board_init();
 	inicializacao_UART();
+	configure_hum();
 	configure_adc();
+	configure_pwm();
 	tc_config(1);
 	
 	pio_set_output(PIOA, PINO_LED_AZUL, HIGH, DISABLE, ENABLE);

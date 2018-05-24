@@ -10,6 +10,8 @@ src\ASF\sam\drivers\adc\adc_sam3u.c
 
 src\ASF\sam\drivers\ebi\smc\smc.c
 
+src\ASF\sam\drivers\pwm\pwm.c
+
 src\ASF\sam\drivers\tc\tc.c
 
 src\ASF\sam\drivers\usart\usart.c
