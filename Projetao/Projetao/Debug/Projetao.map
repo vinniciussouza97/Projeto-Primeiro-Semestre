@@ -418,8 +418,8 @@ Discarded input sections
                 0x00000000        0x8 src/ASF/sam/drivers/adc/adc.o
  .text.adc_get_channel_status
                 0x00000000        0xc src/ASF/sam/drivers/adc/adc.o
- .text.adc_get_channel_value
-                0x00000000        0xe src/ASF/sam/drivers/adc/adc.o
+ .text.adc_get_latest_value
+                0x00000000        0x4 src/ASF/sam/drivers/adc/adc.o
  .text.adc_enable_tag
                 0x00000000        0xa src/ASF/sam/drivers/adc/adc.o
  .text.adc_disable_tag
@@ -5900,215 +5900,214 @@ LOAD c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin
  .text.adc_enable_channel
                 0x004001d8        0xa src/ASF/sam/drivers/adc/adc.o
                 0x004001d8                adc_enable_channel
- .text.adc_get_latest_value
-                0x004001e2        0x4 src/ASF/sam/drivers/adc/adc.o
-                0x004001e2                adc_get_latest_value
+ .text.adc_get_channel_value
+                0x004001e2        0xe src/ASF/sam/drivers/adc/adc.o
+                0x004001e2                adc_get_channel_value
  .text.adc_enable_interrupt
-                0x004001e6        0x4 src/ASF/sam/drivers/adc/adc.o
-                0x004001e6                adc_enable_interrupt
+                0x004001f0        0x4 src/ASF/sam/drivers/adc/adc.o
+                0x004001f0                adc_enable_interrupt
  .text.adc_get_status
-                0x004001ea        0x4 src/ASF/sam/drivers/adc/adc.o
-                0x004001ea                adc_get_status
- .text.tc_init  0x004001ee       0x18 src/ASF/sam/drivers/tc/tc.o
-                0x004001ee                tc_init
+                0x004001f4        0x4 src/ASF/sam/drivers/adc/adc.o
+                0x004001f4                adc_get_status
+ .text.tc_init  0x004001f8       0x18 src/ASF/sam/drivers/tc/tc.o
+                0x004001f8                tc_init
  .text.tc_start
-                0x00400206        0x8 src/ASF/sam/drivers/tc/tc.o
-                0x00400206                tc_start
+                0x00400210        0x8 src/ASF/sam/drivers/tc/tc.o
+                0x00400210                tc_start
  .text.tc_write_rc
-                0x0040020e        0x8 src/ASF/sam/drivers/tc/tc.o
-                0x0040020e                tc_write_rc
+                0x00400218        0x8 src/ASF/sam/drivers/tc/tc.o
+                0x00400218                tc_write_rc
  .text.tc_enable_interrupt
-                0x00400216        0x8 src/ASF/sam/drivers/tc/tc.o
-                0x00400216                tc_enable_interrupt
+                0x00400220        0x8 src/ASF/sam/drivers/tc/tc.o
+                0x00400220                tc_enable_interrupt
  .text.tc_get_status
-                0x0040021e        0x8 src/ASF/sam/drivers/tc/tc.o
-                0x0040021e                tc_get_status
+                0x00400228        0x8 src/ASF/sam/drivers/tc/tc.o
+                0x00400228                tc_get_status
  .text.tc_find_mck_divisor
-                0x00400226       0x70 src/ASF/sam/drivers/tc/tc.o
-                0x00400226                tc_find_mck_divisor
+                0x00400230       0x70 src/ASF/sam/drivers/tc/tc.o
+                0x00400230                tc_find_mck_divisor
  .text.usart_write
-                0x00400296       0x14 src/ASF/sam/drivers/usart/usart.o
-                0x00400296                usart_write
+                0x004002a0       0x14 src/ASF/sam/drivers/usart/usart.o
+                0x004002a0                usart_write
  .text.usart_read
-                0x004002aa       0x18 src/ASF/sam/drivers/usart/usart.o
-                0x004002aa                usart_read
- *fill*         0x004002c2        0x2 
- .text._write   0x004002c4       0x50 src/ASF/common/utils/stdio/write.o
-                0x004002c4                _write
+                0x004002b4       0x18 src/ASF/sam/drivers/usart/usart.o
+                0x004002b4                usart_read
+ .text._write   0x004002cc       0x50 src/ASF/common/utils/stdio/write.o
+                0x004002cc                _write
  .text.uart_init
-                0x00400314       0x36 src/ASF/sam/drivers/uart/uart.o
-                0x00400314                uart_init
+                0x0040031c       0x36 src/ASF/sam/drivers/uart/uart.o
+                0x0040031c                uart_init
  .text.uart_write
-                0x0040034a       0x10 src/ASF/sam/drivers/uart/uart.o
-                0x0040034a                uart_write
+                0x00400352       0x10 src/ASF/sam/drivers/uart/uart.o
+                0x00400352                uart_write
  .text.uart_read
-                0x0040035a       0x12 src/ASF/sam/drivers/uart/uart.o
-                0x0040035a                uart_read
+                0x00400362       0x12 src/ASF/sam/drivers/uart/uart.o
+                0x00400362                uart_read
  .text.sysclk_init
-                0x0040036c       0x64 src/ASF/common/services/clock/sam4s/sysclk.o
-                0x0040036c                sysclk_init
+                0x00400374       0x64 src/ASF/common/services/clock/sam4s/sysclk.o
+                0x00400374                sysclk_init
  .text.board_init
-                0x004003d0      0x144 src/ASF/sam/boards/sam4s_ek2/init.o
-                0x004003d0                board_init
- .text.pio_set  0x00400514        0x4 src/ASF/sam/drivers/pio/pio.o
-                0x00400514                pio_set
+                0x004003d8      0x144 src/ASF/sam/boards/sam4s_ek2/init.o
+                0x004003d8                board_init
+ .text.pio_set  0x0040051c        0x4 src/ASF/sam/drivers/pio/pio.o
+                0x0040051c                pio_set
  .text.pio_clear
-                0x00400518        0x4 src/ASF/sam/drivers/pio/pio.o
-                0x00400518                pio_clear
+                0x00400520        0x4 src/ASF/sam/drivers/pio/pio.o
+                0x00400520                pio_clear
  .text.pio_set_peripheral
-                0x0040051c       0x90 src/ASF/sam/drivers/pio/pio.o
-                0x0040051c                pio_set_peripheral
+                0x00400524       0x90 src/ASF/sam/drivers/pio/pio.o
+                0x00400524                pio_set_peripheral
  .text.pio_set_input
-                0x004005ac       0x32 src/ASF/sam/drivers/pio/pio.o
-                0x004005ac                pio_set_input
+                0x004005b4       0x32 src/ASF/sam/drivers/pio/pio.o
+                0x004005b4                pio_set_input
  .text.pio_set_output
-                0x004005de       0x26 src/ASF/sam/drivers/pio/pio.o
-                0x004005de                pio_set_output
+                0x004005e6       0x26 src/ASF/sam/drivers/pio/pio.o
+                0x004005e6                pio_set_output
  .text.pio_get_interrupt_status
-                0x00400604        0x4 src/ASF/sam/drivers/pio/pio.o
-                0x00400604                pio_get_interrupt_status
+                0x0040060c        0x4 src/ASF/sam/drivers/pio/pio.o
+                0x0040060c                pio_get_interrupt_status
  .text.pio_get_interrupt_mask
-                0x00400608        0x4 src/ASF/sam/drivers/pio/pio.o
-                0x00400608                pio_get_interrupt_mask
+                0x00400610        0x4 src/ASF/sam/drivers/pio/pio.o
+                0x00400610                pio_get_interrupt_mask
  .text.pio_set_pin_low
-                0x0040060c       0x1a src/ASF/sam/drivers/pio/pio.o
-                0x0040060c                pio_set_pin_low
+                0x00400614       0x1a src/ASF/sam/drivers/pio/pio.o
+                0x00400614                pio_set_pin_low
  .text.pio_toggle_pin
-                0x00400626       0x20 src/ASF/sam/drivers/pio/pio.o
-                0x00400626                pio_toggle_pin
- *fill*         0x00400646        0x2 
+                0x0040062e       0x20 src/ASF/sam/drivers/pio/pio.o
+                0x0040062e                pio_toggle_pin
+ *fill*         0x0040064e        0x2 
  .text.pio_configure_pin
-                0x00400648      0x120 src/ASF/sam/drivers/pio/pio.o
-                0x00400648                pio_configure_pin
+                0x00400650      0x120 src/ASF/sam/drivers/pio/pio.o
+                0x00400650                pio_configure_pin
  .text.pio_configure_pin_group
-                0x00400768       0xd8 src/ASF/sam/drivers/pio/pio.o
-                0x00400768                pio_configure_pin_group
+                0x00400770       0xd8 src/ASF/sam/drivers/pio/pio.o
+                0x00400770                pio_configure_pin_group
  .text.pio_handler_process
-                0x00400840       0x68 src/ASF/sam/drivers/pio/pio_handler.o
-                0x00400840                pio_handler_process
+                0x00400848       0x68 src/ASF/sam/drivers/pio/pio_handler.o
+                0x00400848                pio_handler_process
  .text.PIOA_Handler
-                0x004008a8       0x14 src/ASF/sam/drivers/pio/pio_handler.o
-                0x004008a8                PIOA_Handler
+                0x004008b0       0x14 src/ASF/sam/drivers/pio/pio_handler.o
+                0x004008b0                PIOA_Handler
  .text.PIOB_Handler
-                0x004008bc       0x14 src/ASF/sam/drivers/pio/pio_handler.o
-                0x004008bc                PIOB_Handler
+                0x004008c4       0x14 src/ASF/sam/drivers/pio/pio_handler.o
+                0x004008c4                PIOB_Handler
  .text.PIOC_Handler
-                0x004008d0       0x14 src/ASF/sam/drivers/pio/pio_handler.o
-                0x004008d0                PIOC_Handler
+                0x004008d8       0x14 src/ASF/sam/drivers/pio/pio_handler.o
+                0x004008d8                PIOC_Handler
  .text.pmc_switch_mck_to_pllack
-                0x004008e4       0x64 src/ASF/sam/drivers/pmc/pmc.o
-                0x004008e4                pmc_switch_mck_to_pllack
+                0x004008ec       0x64 src/ASF/sam/drivers/pmc/pmc.o
+                0x004008ec                pmc_switch_mck_to_pllack
  .text.pmc_switch_mainck_to_xtal
-                0x00400948       0x54 src/ASF/sam/drivers/pmc/pmc.o
-                0x00400948                pmc_switch_mainck_to_xtal
+                0x00400950       0x54 src/ASF/sam/drivers/pmc/pmc.o
+                0x00400950                pmc_switch_mainck_to_xtal
  .text.pmc_osc_is_ready_mainck
-                0x0040099c       0x10 src/ASF/sam/drivers/pmc/pmc.o
-                0x0040099c                pmc_osc_is_ready_mainck
+                0x004009a4       0x10 src/ASF/sam/drivers/pmc/pmc.o
+                0x004009a4                pmc_osc_is_ready_mainck
  .text.pmc_disable_pllack
-                0x004009ac       0x10 src/ASF/sam/drivers/pmc/pmc.o
-                0x004009ac                pmc_disable_pllack
+                0x004009b4       0x10 src/ASF/sam/drivers/pmc/pmc.o
+                0x004009b4                pmc_disable_pllack
  .text.pmc_is_locked_pllack
-                0x004009bc       0x10 src/ASF/sam/drivers/pmc/pmc.o
-                0x004009bc                pmc_is_locked_pllack
+                0x004009c4       0x10 src/ASF/sam/drivers/pmc/pmc.o
+                0x004009c4                pmc_is_locked_pllack
  .text.pmc_enable_periph_clk
-                0x004009cc       0x54 src/ASF/sam/drivers/pmc/pmc.o
-                0x004009cc                pmc_enable_periph_clk
+                0x004009d4       0x54 src/ASF/sam/drivers/pmc/pmc.o
+                0x004009d4                pmc_enable_periph_clk
  .text.Dummy_Handler
-                0x00400a20        0x2 src/ASF/sam/utils/cmsis/sam4s/source/templates/gcc/startup_sam4s.o
-                0x00400a20                DACC_Handler
-                0x00400a20                DebugMon_Handler
-                0x00400a20                HardFault_Handler
-                0x00400a20                TC2_Handler
-                0x00400a20                SPI_Handler
-                0x00400a20                SysTick_Handler
-                0x00400a20                TWI1_Handler
-                0x00400a20                PendSV_Handler
-                0x00400a20                NMI_Handler
-                0x00400a20                CRCCU_Handler
-                0x00400a20                USART0_Handler
-                0x00400a20                RTT_Handler
-                0x00400a20                EFC1_Handler
-                0x00400a20                RTC_Handler
-                0x00400a20                UsageFault_Handler
-                0x00400a20                WDT_Handler
-                0x00400a20                TC4_Handler
-                0x00400a20                TC1_Handler
-                0x00400a20                HSMCI_Handler
-                0x00400a20                UART1_Handler
-                0x00400a20                TC3_Handler
-                0x00400a20                Dummy_Handler
-                0x00400a20                TWI0_Handler
-                0x00400a20                USART1_Handler
-                0x00400a20                SSC_Handler
-                0x00400a20                EFC0_Handler
-                0x00400a20                ACC_Handler
-                0x00400a20                PMC_Handler
-                0x00400a20                PWM_Handler
-                0x00400a20                MemManage_Handler
-                0x00400a20                SUPC_Handler
-                0x00400a20                SVC_Handler
-                0x00400a20                UART0_Handler
-                0x00400a20                UDP_Handler
-                0x00400a20                BusFault_Handler
-                0x00400a20                RSTC_Handler
-                0x00400a20                TC5_Handler
- *fill*         0x00400a22        0x2 
+                0x00400a28        0x2 src/ASF/sam/utils/cmsis/sam4s/source/templates/gcc/startup_sam4s.o
+                0x00400a28                DACC_Handler
+                0x00400a28                DebugMon_Handler
+                0x00400a28                HardFault_Handler
+                0x00400a28                TC2_Handler
+                0x00400a28                SPI_Handler
+                0x00400a28                SysTick_Handler
+                0x00400a28                TWI1_Handler
+                0x00400a28                PendSV_Handler
+                0x00400a28                NMI_Handler
+                0x00400a28                CRCCU_Handler
+                0x00400a28                USART0_Handler
+                0x00400a28                RTT_Handler
+                0x00400a28                EFC1_Handler
+                0x00400a28                RTC_Handler
+                0x00400a28                UsageFault_Handler
+                0x00400a28                WDT_Handler
+                0x00400a28                TC4_Handler
+                0x00400a28                TC1_Handler
+                0x00400a28                HSMCI_Handler
+                0x00400a28                UART1_Handler
+                0x00400a28                TC3_Handler
+                0x00400a28                Dummy_Handler
+                0x00400a28                TWI0_Handler
+                0x00400a28                USART1_Handler
+                0x00400a28                SSC_Handler
+                0x00400a28                EFC0_Handler
+                0x00400a28                ACC_Handler
+                0x00400a28                PMC_Handler
+                0x00400a28                PWM_Handler
+                0x00400a28                MemManage_Handler
+                0x00400a28                SUPC_Handler
+                0x00400a28                SVC_Handler
+                0x00400a28                UART0_Handler
+                0x00400a28                UDP_Handler
+                0x00400a28                BusFault_Handler
+                0x00400a28                RSTC_Handler
+                0x00400a28                TC5_Handler
+ *fill*         0x00400a2a        0x2 
  .text.Reset_Handler
-                0x00400a24       0xac src/ASF/sam/utils/cmsis/sam4s/source/templates/gcc/startup_sam4s.o
-                0x00400a24                Reset_Handler
+                0x00400a2c       0xac src/ASF/sam/utils/cmsis/sam4s/source/templates/gcc/startup_sam4s.o
+                0x00400a2c                Reset_Handler
  .text.SystemCoreClockUpdate
-                0x00400ad0      0x110 src/ASF/sam/utils/cmsis/sam4s/source/templates/system_sam4s.o
-                0x00400ad0                SystemCoreClockUpdate
+                0x00400ad8      0x110 src/ASF/sam/utils/cmsis/sam4s/source/templates/system_sam4s.o
+                0x00400ad8                SystemCoreClockUpdate
  .text.system_init_flash
-                0x00400be0       0x94 src/ASF/sam/utils/cmsis/sam4s/source/templates/system_sam4s.o
-                0x00400be0                system_init_flash
- .text._sbrk    0x00400c74       0x38 src/ASF/sam/utils/syscalls/gcc/syscalls.o
-                0x00400c74                _sbrk
- .text._close   0x00400cac        0x6 src/ASF/sam/utils/syscalls/gcc/syscalls.o
-                0x00400cac                _close
- .text._fstat   0x00400cb2        0xa src/ASF/sam/utils/syscalls/gcc/syscalls.o
-                0x00400cb2                _fstat
- .text._isatty  0x00400cbc        0x4 src/ASF/sam/utils/syscalls/gcc/syscalls.o
-                0x00400cbc                _isatty
- .text._lseek   0x00400cc0        0x4 src/ASF/sam/utils/syscalls/gcc/syscalls.o
-                0x00400cc0                _lseek
+                0x00400be8       0x94 src/ASF/sam/utils/cmsis/sam4s/source/templates/system_sam4s.o
+                0x00400be8                system_init_flash
+ .text._sbrk    0x00400c7c       0x38 src/ASF/sam/utils/syscalls/gcc/syscalls.o
+                0x00400c7c                _sbrk
+ .text._close   0x00400cb4        0x6 src/ASF/sam/utils/syscalls/gcc/syscalls.o
+                0x00400cb4                _close
+ .text._fstat   0x00400cba        0xa src/ASF/sam/utils/syscalls/gcc/syscalls.o
+                0x00400cba                _fstat
+ .text._isatty  0x00400cc4        0x4 src/ASF/sam/utils/syscalls/gcc/syscalls.o
+                0x00400cc4                _isatty
+ .text._lseek   0x00400cc8        0x4 src/ASF/sam/utils/syscalls/gcc/syscalls.o
+                0x00400cc8                _lseek
  .text.usart_serial_getchar
-                0x00400cc4       0x88 src/main.o
+                0x00400ccc       0x88 src/main.o
  .text.usart_serial_putchar
-                0x00400d4c       0x80 src/main.o
+                0x00400d54       0x80 src/main.o
  .text.inicializacao_UART
-                0x00400dcc       0x98 src/main.o
-                0x00400dcc                inicializacao_UART
+                0x00400dd4       0x98 src/main.o
+                0x00400dd4                inicializacao_UART
  .text.TC0_Handler
-                0x00400e64       0x2c src/main.o
-                0x00400e64                TC0_Handler
+                0x00400e6c       0x2c src/main.o
+                0x00400e6c                TC0_Handler
  .text.ADC_Handler
-                0x00400e90       0xdc src/main.o
-                0x00400e90                ADC_Handler
+                0x00400e98       0xdc src/main.o
+                0x00400e98                ADC_Handler
  .text.configure_adc
-                0x00400f6c       0x7c src/main.o
-                0x00400f6c                configure_adc
+                0x00400f74       0x80 src/main.o
+                0x00400f74                configure_adc
  .text.configure_pwm
-                0x00400fe8       0x48 src/main.o
-                0x00400fe8                configure_pwm
- .text.main     0x00401030       0xd4 src/main.o
-                0x00401030                main
+                0x00400ff4       0x48 src/main.o
+                0x00400ff4                configure_pwm
+ .text.main     0x0040103c       0xd4 src/main.o
+                0x0040103c                main
  .text.__libc_init_array
-                0x00401104       0x50 c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-init.o)
-                0x00401104                __libc_init_array
- .text.memset   0x00401154       0x9c c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-memset.o)
-                0x00401154                memset
- .text._puts_r  0x004011f0       0x9c c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-puts.o)
-                0x004011f0                _puts_r
- .text.puts     0x0040128c       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-puts.o)
-                0x0040128c                puts
- .text.setbuf   0x0040129c       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-setbuf.o)
-                0x0040129c                setbuf
- .text.setvbuf  0x004012ac      0x190 c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-setvbuf.o)
-                0x004012ac                setvbuf
- .text.sprintf  0x0040143c       0x4c c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-sprintf.o)
-                0x0040143c                sprintf
- *fill*         0x00401488       0x38 
+                0x00401110       0x50 c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-init.o)
+                0x00401110                __libc_init_array
+ .text.memset   0x00401160       0x9c c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-memset.o)
+                0x00401160                memset
+ .text._puts_r  0x004011fc       0x9c c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-puts.o)
+                0x004011fc                _puts_r
+ .text.puts     0x00401298       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-puts.o)
+                0x00401298                puts
+ .text.setbuf   0x004012a8       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-setbuf.o)
+                0x004012a8                setbuf
+ .text.setvbuf  0x004012b8      0x190 c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-setvbuf.o)
+                0x004012b8                setvbuf
+ .text.sprintf  0x00401448       0x4c c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-sprintf.o)
+                0x00401448                sprintf
+ *fill*         0x00401494       0x2c 
  .text          0x004014c0       0xdc c:/program files (x86)/atmel/studio/7.0/toolchain/arm/arm-gnu-toolchain/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a(lib_a-strlen.o)
                 0x004014c0                strlen
  .text._svfprintf_r
@@ -6709,7 +6708,7 @@ OUTPUT(Projetao.elf elf32-littlearm)
  .comment       0x00000059       0x5a src/ASF/sam/utils/syscalls/gcc/syscalls.o
  .comment       0x00000059       0x5a src/main.o
 
-.debug_info     0x00000000    0x137c8
+.debug_info     0x00000000    0x137e6
  .debug_info    0x00000000      0xac9 src/ASF/common/utils/stdio/read.o
  .debug_info    0x00000ac9     0x1b44 src/ASF/sam/drivers/adc/adc.o
  .debug_info    0x0000260d     0x123f src/ASF/sam/drivers/tc/tc.o
@@ -6724,7 +6723,7 @@ OUTPUT(Projetao.elf elf32-littlearm)
  .debug_info    0x0000ef72      0x6eb src/ASF/sam/utils/cmsis/sam4s/source/templates/gcc/startup_sam4s.o
  .debug_info    0x0000f65d      0x458 src/ASF/sam/utils/cmsis/sam4s/source/templates/system_sam4s.o
  .debug_info    0x0000fab5      0xdb0 src/ASF/sam/utils/syscalls/gcc/syscalls.o
- .debug_info    0x00010865     0x2f63 src/main.o
+ .debug_info    0x00010865     0x2f81 src/main.o
 
 .debug_abbrev   0x00000000     0x294a
  .debug_abbrev  0x00000000      0x1fe src/ASF/common/utils/stdio/read.o
@@ -6808,7 +6807,7 @@ OUTPUT(Projetao.elf elf32-littlearm)
  .debug_ranges  0x000009a0       0x50 src/ASF/sam/utils/syscalls/gcc/syscalls.o
  .debug_ranges  0x000009f0       0x50 src/main.o
 
-.debug_macro    0x00000000    0x132e6
+.debug_macro    0x00000000    0x132ec
  .debug_macro   0x00000000      0x524 src/ASF/common/utils/stdio/read.o
  .debug_macro   0x00000524      0x8ce src/ASF/common/utils/stdio/read.o
  .debug_macro   0x00000df2      0x16d src/ASF/common/utils/stdio/read.o
@@ -6954,11 +6953,11 @@ OUTPUT(Projetao.elf elf32-littlearm)
  .debug_macro   0x00012a2d       0x10 src/ASF/sam/utils/syscalls/gcc/syscalls.o
  .debug_macro   0x00012a3d       0x35 src/ASF/sam/utils/syscalls/gcc/syscalls.o
  .debug_macro   0x00012a72      0x122 src/ASF/sam/utils/syscalls/gcc/syscalls.o
- .debug_macro   0x00012b94      0x732 src/main.o
- .debug_macro   0x000132c6       0x10 src/main.o
- .debug_macro   0x000132d6       0x10 src/main.o
+ .debug_macro   0x00012b94      0x738 src/main.o
+ .debug_macro   0x000132cc       0x10 src/main.o
+ .debug_macro   0x000132dc       0x10 src/main.o
 
-.debug_line     0x00000000     0xb5ec
+.debug_line     0x00000000     0xb5ed
  .debug_line    0x00000000      0xab0 src/ASF/common/utils/stdio/read.o
  .debug_line    0x00000ab0      0xe76 src/ASF/sam/drivers/adc/adc.o
  .debug_line    0x00001926      0xc4e src/ASF/sam/drivers/tc/tc.o
@@ -6973,9 +6972,9 @@ OUTPUT(Projetao.elf elf32-littlearm)
  .debug_line    0x0000906b      0x88b src/ASF/sam/utils/cmsis/sam4s/source/templates/gcc/startup_sam4s.o
  .debug_line    0x000098f6      0x8bd src/ASF/sam/utils/cmsis/sam4s/source/templates/system_sam4s.o
  .debug_line    0x0000a1b3      0x40b src/ASF/sam/utils/syscalls/gcc/syscalls.o
- .debug_line    0x0000a5be     0x102e src/main.o
+ .debug_line    0x0000a5be     0x102f src/main.o
 
-.debug_str      0x00000000    0x53e2b
+.debug_str      0x00000000    0x53e45
  .debug_str     0x00000000    0x4a5d1 src/ASF/common/utils/stdio/read.o
                               0x4a997 (size before relaxing)
  .debug_str     0x0004a5d1      0xac8 src/ASF/sam/drivers/adc/adc.o
@@ -7004,8 +7003,8 @@ OUTPUT(Projetao.elf elf32-littlearm)
                               0x3b186 (size before relaxing)
  .debug_str     0x00052f31      0x76d src/ASF/sam/utils/syscalls/gcc/syscalls.o
                                0x7404 (size before relaxing)
- .debug_str     0x0005369e      0x78d src/main.o
-                              0x51520 (size before relaxing)
+ .debug_str     0x0005369e      0x7a7 src/main.o
+                              0x5153b (size before relaxing)
 
 .debug_frame    0x00000000     0x2874
  .debug_frame   0x00000000       0x30 src/ASF/common/utils/stdio/read.o
@@ -7562,10 +7561,10 @@ adc_enable_ts                                     src/ASF/sam/drivers/adc/adc.o
 adc_get_actual_adc_clock                          src/ASF/sam/drivers/adc/adc.o
 adc_get_channel_status                            src/ASF/sam/drivers/adc/adc.o
 adc_get_channel_value                             src/ASF/sam/drivers/adc/adc.o
+                                                  src/main.o
 adc_get_comparison_mode                           src/ASF/sam/drivers/adc/adc.o
 adc_get_interrupt_mask                            src/ASF/sam/drivers/adc/adc.o
 adc_get_latest_value                              src/ASF/sam/drivers/adc/adc.o
-                                                  src/main.o
 adc_get_overrun_status                            src/ASF/sam/drivers/adc/adc.o
 adc_get_pdc_base                                  src/ASF/sam/drivers/adc/adc.o
 adc_get_status                                    src/ASF/sam/drivers/adc/adc.o

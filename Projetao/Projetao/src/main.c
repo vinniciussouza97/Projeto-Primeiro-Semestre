@@ -23,7 +23,8 @@
 #define TRANSFER_PERIOD  2
 #define STARTUP_TIME	ADC_STARTUP_TIME_4
 #define MAX_DIGITAL     (4095)
-#define ADC_CHANNEL 5
+#define ADC_CHANNEL_LDR 5	//LDR no pino PB1
+#define ADC_CHANNEL_UMIDADE	0	//Sensor de umidade do solo
 
 #define PWM_FREQUENCY	1000	/** PWM frequency in Hz */
 #define PERIOD_VALUE	4096	/** Period value of PWM output waveform */
@@ -95,7 +96,7 @@ void ADC_Handler(void)
 
 	if ((adc_get_status(ADC) & ADC_ISR_DRDY) == ADC_ISR_DRDY)
 	{
-		result = adc_get_latest_value(ADC);
+		result = adc_get_channel_value(ADC, ADC_CHANNEL_LDR);
 		
 		//exibição do último valor
 		char buffer[10];
@@ -142,7 +143,8 @@ void configure_adc(void)
 	adc_init(ADC, sysclk_get_cpu_hz(), 6400000, STARTUP_TIME);
 	adc_configure_timing(ADC, TRACKING_TIME	, ADC_SETTLING_TIME_3, TRANSFER_PERIOD);
 	adc_configure_trigger(ADC, ADC_TRIG_SW, 0);
-	adc_enable_channel(ADC, ADC_CHANNEL);
+	adc_enable_channel(ADC, ADC_CHANNEL_LDR);
+	adc_enable_channel(ADC, ADC_CHANNEL_UMIDADE);
 	NVIC_SetPriority(ADC_IRQn, 5);
 	NVIC_EnableIRQ(ADC_IRQn);
 	adc_enable_interrupt(ADC, ADC_IER_DRDY);
