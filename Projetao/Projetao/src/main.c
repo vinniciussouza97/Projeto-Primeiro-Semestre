@@ -3,6 +3,8 @@
 #include "conf_board.h"
 #include "conf_clock.h"
 
+#define ILI93XX_LCD_CS      1
+
 #define CONF_UART              UART0
 #define CONF_UART_BAUDRATE     9600
 #define CONF_UART_CHAR_LENGTH  US_MR_CHRL_8_BIT
@@ -24,11 +26,15 @@
 #define STARTUP_TIME	ADC_STARTUP_TIME_4
 #define MAX_DIGITAL     (4095)
 #define ADC_CHANNEL_LDR 5	//LDR no pino PB1
-#define ADC_CHANNEL_UMIDADE	0	//Sensor de umidade do solo
+#define ADC_ISR_LDR	ADC_ISR_EOC5
+#define ADC_CHANNEL_UMIDADE	0	//Sensor de umidade do solo PA17
+#define ADC_ISR_UMIDADE	ADC_ISR_EOC0
+
+#define UMIDADE_MINIMA	3700	// Quanto maior, mais seco
 
 #define PWM_FREQUENCY	1000	/** PWM frequency in Hz */
 #define PERIOD_VALUE	4096	/** Period value of PWM output waveform */
-#define INIT_DUTY_VALUE	4000	/** Initial duty cycle value */
+#define INIT_DUTY_VALUE	1024	/** Initial duty cycle value */
 #define PWM_CHANNEL_BOMBA	2	//Canal PWM da bomba
 #define PWM_CHANNEL_BOMBA_EN	PWM_ENA_CHID2	//Enable do canal. Ultimo digito = canal
 #define PIN_BOMBA	PIO_PDR_P13	//Pino da bomba
@@ -38,13 +44,19 @@
 #define PIO_HUM	PIOA
 #define PINO_HUM	PIO_PA14
 
-#define TEMPO_MAX_ESCURO	10
+#define TEMPO_MAX_ESCURO	30
+#define INTERVALO_MEDICAO	10
+#define INTERVALO_ATIVO	1
+
+struct ili93xx_opt_t g_ili93xx_display_opt;
 
 uint32_t	escuro_max = TEMPO_MAX_ESCURO;
 uint32_t	escuro = TEMPO_MAX_ESCURO;
 uint32_t	luz_min = 50;	//Luz minima em %
 uint32_t	duty_cycle = INIT_DUTY_VALUE;
 uint32_t	max_aceso = 10;	//Tempo maximo com a luz acesa
+uint32_t	tempo_entre_medicoes = INTERVALO_MEDICAO;
+uint32_t	tempo_prox_medicao = INTERVALO_MEDICAO;
 
 void inicializacao_UART (){
 	
@@ -82,42 +94,96 @@ void TC_Handler(void)
 {
 	tc_get_status(TC,CHANNEL);
 	LED_Toggle(LED0_GPIO);
-	adc_start(ADC);
-	//if (duty_cycle == INIT_DUTY_VALUE)
-		//duty_cycle = 1000;
-	//else
-		//duty_cycle = INIT_DUTY_VALUE;
-	//PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
+	tempo_prox_medicao--;
+	
+	if (tempo_prox_medicao <= 0)
+	{
+		adc_start(ADC);
+		tempo_prox_medicao = tempo_entre_medicoes;
+	}
+	
+	char buffer[100];
+	sprintf(buffer, "Entre medicoes: %d\nProx medicao: %d\n", tempo_entre_medicoes, tempo_prox_medicao);
+
+	ili93xx_set_foreground_color(COLOR_WHITE);
+	ili93xx_draw_filled_rectangle(0, 0, ILI93XX_LCD_WIDTH, 100);
+
+	ili93xx_set_foreground_color(COLOR_BLACK);
+	ili93xx_draw_string(5, 5, (uint8_t*) buffer);
 }
 
 void ADC_Handler(void)
 {
 	uint16_t result;
 
-	if ((adc_get_status(ADC) & ADC_ISR_DRDY) == ADC_ISR_DRDY)
+	if (adc_get_status(ADC) & ADC_ISR_LDR)
 	{
 		result = adc_get_channel_value(ADC, ADC_CHANNEL_LDR);
 		
 		//exibição do último valor
-		char buffer[10];
-		sprintf (buffer, "%d", result);
+		char buffer[30];
+		sprintf (buffer, "LDR: %d", result);
 		puts(buffer);
 		puts("\r");
 		
+		ili93xx_set_foreground_color(COLOR_WHITE);
+		ili93xx_draw_filled_rectangle(0, 150, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
+		ili93xx_set_foreground_color(COLOR_BLACK);
+		ili93xx_draw_string(5, 155, (uint8_t*) buffer);
+		
 		//lógica de tempo para acender lâmpada
 		if (result <= (4095*luz_min/100))
-			escuro--;
+			escuro -= tempo_entre_medicoes;
 		else
 			escuro = escuro_max;
-		sprintf (buffer, "%d", escuro);
+		sprintf (buffer, "Escuro: %d", escuro);
 		puts(buffer);
 		puts("\r");
-		if (escuro <= -max_aceso)
-			pio_set(PIOA, PINO_LED_VERDE);
-		else if (escuro <= 0)
+		ili93xx_set_foreground_color(COLOR_WHITE);
+		ili93xx_draw_filled_rectangle(0, 171, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
+		ili93xx_set_foreground_color(COLOR_BLACK);
+		ili93xx_draw_string(5, 176, (uint8_t*) buffer);
+		
+		if (escuro <= 0)
 			pio_clear(PIOA, PINO_LED_VERDE);
 		else
 			pio_set(PIOA, PINO_LED_VERDE);
+		// (escuro <= -max_aceso)
+			//pio_set(PIOA, PINO_LED_VERDE);	
+	}
+	else if (adc_get_status(ADC) & ADC_ISR_UMIDADE)
+	{
+		result = adc_get_channel_value(ADC, ADC_CHANNEL_UMIDADE);
+		
+		char buffer[30];
+		sprintf (buffer, "Umidade: %d", result);
+		puts(buffer);
+		puts("\r");
+		ili93xx_set_foreground_color(COLOR_WHITE);
+		ili93xx_draw_filled_rectangle(0, 192, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
+		ili93xx_set_foreground_color(COLOR_BLACK);
+		ili93xx_draw_string(5, 197, (uint8_t*) buffer);
+		
+		if (result <= UMIDADE_MINIMA)
+		{
+			duty_cycle = 4095;
+			PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
+			if (tempo_entre_medicoes != INTERVALO_ATIVO)
+			{
+				tempo_entre_medicoes = INTERVALO_ATIVO;
+				tempo_prox_medicao = tempo_entre_medicoes;
+			}
+		}
+		else
+		{
+			duty_cycle = 0;
+			PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
+			if (tempo_entre_medicoes != INTERVALO_MEDICAO)
+			{
+				tempo_entre_medicoes = INTERVALO_MEDICAO;
+				tempo_prox_medicao = tempo_entre_medicoes;
+			}
+		}
 	}
 }
 
@@ -147,7 +213,8 @@ void configure_adc(void)
 	adc_enable_channel(ADC, ADC_CHANNEL_UMIDADE);
 	NVIC_SetPriority(ADC_IRQn, 5);
 	NVIC_EnableIRQ(ADC_IRQn);
-	adc_enable_interrupt(ADC, ADC_IER_DRDY);
+	adc_enable_interrupt(ADC, ADC_ISR_LDR);
+	adc_enable_interrupt(ADC, ADC_ISR_UMIDADE);
 }
 
 void configure_pwm(void)
@@ -169,6 +236,51 @@ void configure_pwm(void)
 	PWM->PWM_ENA = PWM_CHANNEL_BOMBA_EN;
 }
 
+void configure_lcd()
+{
+	/** Enable peripheral clock */
+	pmc_enable_periph_clk(ID_SMC);
+
+	/** Configure SMC interface for Lcd */
+	smc_set_setup_timing(SMC, ILI93XX_LCD_CS, SMC_SETUP_NWE_SETUP(2)
+	| SMC_SETUP_NCS_WR_SETUP(2)
+	| SMC_SETUP_NRD_SETUP(2)
+	| SMC_SETUP_NCS_RD_SETUP(2));
+	
+	smc_set_pulse_timing(SMC, ILI93XX_LCD_CS, SMC_PULSE_NWE_PULSE(4)
+	| SMC_PULSE_NCS_WR_PULSE(4)
+	| SMC_PULSE_NRD_PULSE(10)
+	| SMC_PULSE_NCS_RD_PULSE(10));
+	
+	smc_set_cycle_timing(SMC, ILI93XX_LCD_CS, SMC_CYCLE_NWE_CYCLE(10)
+	| SMC_CYCLE_NRD_CYCLE(22));
+	
+	smc_set_mode(SMC, ILI93XX_LCD_CS, SMC_MODE_READ_MODE
+	| SMC_MODE_WRITE_MODE);
+
+	/** Initialize display parameter */
+	g_ili93xx_display_opt.ul_width = ILI93XX_LCD_WIDTH;
+	g_ili93xx_display_opt.ul_height = ILI93XX_LCD_HEIGHT;
+	g_ili93xx_display_opt.foreground_color = COLOR_BLACK;
+	g_ili93xx_display_opt.background_color = COLOR_WHITE;
+
+	/** Switch off backlight */
+	aat31xx_disable_backlight();
+
+	/** Initialize LCD */
+	ili93xx_init(&g_ili93xx_display_opt);
+
+	/** Set backlight level */
+	aat31xx_set_backlight(AAT31XX_AVG_BACKLIGHT_LEVEL);
+
+	ili93xx_set_foreground_color(COLOR_WHITE);
+	ili93xx_draw_filled_rectangle(0, 0, ILI93XX_LCD_WIDTH,
+	ILI93XX_LCD_HEIGHT);
+	/** Turn on LCD */
+	ili93xx_display_on();
+	ili93xx_set_cursor_position(0, 0);
+}
+
 int main (void)
 {
 	sysclk_init();
@@ -176,6 +288,7 @@ int main (void)
 	inicializacao_UART();
 	configure_adc();
 	configure_pwm();
+	configure_lcd();
 	tc_config(1);
 	
 	pio_set_output(PIOA, PINO_LED_AZUL, HIGH, DISABLE, ENABLE);

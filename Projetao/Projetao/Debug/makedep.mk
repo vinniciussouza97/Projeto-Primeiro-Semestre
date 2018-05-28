@@ -4,6 +4,10 @@
 
 src\ASF\common\utils\stdio\read.c
 
+src\ASF\sam\components\display\aat31xx\aat31xx.c
+
+src\ASF\sam\components\display\ili93xx\ili93xx.c
+
 src\ASF\sam\drivers\adc\adc.c
 
 src\ASF\sam\drivers\adc\adc_sam3u.c
