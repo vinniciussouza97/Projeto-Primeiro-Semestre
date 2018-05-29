@@ -2,6 +2,12 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+src\ASF\common\services\delay\sam\cycle_counter.c
+
+src\ASF\sam\components\display\aat31xx\aat31xx.c
+
+src\ASF\sam\components\display\ili93xx\ili93xx.c
+
 src\ASF\sam\drivers\ebi\smc\smc.c
 
 src\ASF\sam\drivers\twi\twi.c

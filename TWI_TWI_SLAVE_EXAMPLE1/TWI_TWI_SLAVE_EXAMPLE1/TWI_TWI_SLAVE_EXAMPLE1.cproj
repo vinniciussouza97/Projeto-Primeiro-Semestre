@@ -213,7 +213,7 @@
           <file path="src/ASF/thirdparty/CMSIS/README.txt" framework="" version="" source="thirdparty/CMSIS/README.txt" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/thirdparty/CMSIS/license.txt" framework="" version="" source="thirdparty/CMSIS/license.txt" changed="False" content-id="Atmel.ASF" />
         </files>
-        <documentation help="http://asf.atmel.com/docs/3.35.1/sam.drivers.twi.twi_slave_example.sam4s_ek2/html/index.html" />
+        <documentation help="http://asf.atmel.com/docs/3.32.0/sam.drivers.twi.twi_slave_example.sam4s_ek2/html/index.html" />
         <offline-documentation help="" />
         <dependencies>
           <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.32.0" />
@@ -222,7 +222,6 @@
         <board id="board.sam4s_ek2" value="Add" config="" content-id="Atmel.ASF" />
       </framework-data>
     </AsfFrameworkConfig>
-    <TriggerUpgrade>false</TriggerUpgrade>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>

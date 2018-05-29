@@ -1,7 +1,103 @@
+/**
+ * \file
+ *
+ * \brief TWI SLAVE Example for SAM.
+ *
+ * Copyright (c) 2011-2016 Atmel Corporation. All rights reserved.
+ *
+ * \asf_license_start
+ *
+ * \page License
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. The name of Atmel may not be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * 4. This software may only be redistributed and used in connection with an
+ *    Atmel microcontroller product.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+ * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * \asf_license_stop
+ *
+ */
+
+/**
+ * \mainpage TWI SLAVE Example
+ *
+ * \section intro Introduction
+ *
+ * The application demonstrates how to use use the SAM TWI peripheral in slave mode.
+ *
+ * \section Requirements
+ *
+ * This package can be used with SAM evaluation kits.
+ *
+ * In addition, another device will be needed to act as the TWI master. The
+ * twi_eeprom_example can be used for that, in which case a second kit
+ * supported by that project is needed.
+ * -# Connect TWD (SDA) for the 2 boards.
+ * -# Connect TWCK (SCL) for the 2 boards.
+ * -# Connect GND for the 2 boards.
+ * -# Make sure there is a pull up resistor on TWD and TWCK.
+ *
+ * \section files Main files:
+ *  - twi.c SAM Two-Wire Interface driver implementation.
+ *  - twi.h SAM Two-Wire Interface driver definitions.
+ *  - twi_slave_example.c Example application.
+ *
+ * \section exampledescription Description of the Example
+ * After launching the program, the device will act as a simple TWI-enabled
+ * serial memory containing 512 bytes. This enables this project to be used
+ * with the twi_eeprom_example project as the master.
+ *
+ * To write in the memory, the TWI master must address the device first, then
+ * send two bytes containing the memory address to access. Additional bytes are
+ * treated as the data to write.
+ *
+ * Reading is done in the same fashion, except that after receiving the memory
+ * address, the device will start outputting data until a STOP condition is
+ * sent by the master.
+ * The default address for the TWI slave is fixed to 0x40. If the board has a TWI
+ * component with this address, you can change the define AT24C_ADDRESS in
+ * twi_eeprom_example.c of twi_eeprom_example project, and the define
+ * SLAVE_ADDRESS in twi_slave_example.c of twi_slave_exmaple project.
+ *
+ * \section compinfo Compilation Info
+ * This software was written for the GNU GCC and IAR EWARM.
+ * Other compilers may or may not work.
+ *
+ * \section contactinfo Contact Information
+ * For further information, visit
+ * <A href="http://www.atmel.com/">Atmel</A>.\n
+ * Support and FAQ: http://www.atmel.com/design-support/
+ *
+ */
+/*
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
+
 #include "asf.h"
-#include "stdio_serial.h"
-#include "conf_board.h"
-#include "led.h"
+#include "conf_twi_slave_example.h"
 
 /// @cond 0
 /**INDENT-OFF**/
@@ -11,56 +107,101 @@ extern "C" {
 /**INDENT-ON**/
 /// @endcond
 
-/** EEPROM Wait Time */
-#define WAIT_TIME   10
-/** TWI Bus Clock 400kHz */
-#define TWI_CLK     400000
-/** Address of AT24C chips */
-#define AT24C_ADDRESS           0x50
-#define EEPROM_MEM_ADDR         0
-#define EEPROM_MEM_ADDR_LENGTH  2
-
-/** Data to be sent */
-#define TEST_DATA_LENGTH  (sizeof(test_data_tx)/sizeof(uint8_t))
+/** Device address of slave */
+#define SLAVE_ADDRESS       0x40
+/** Memory size in bytes */
+#define MEMORY_SIZE         512
 
 #define STRING_EOL    "\r"
-#define STRING_HEADER "--TWI EEPROM Example --\r\n" \
+#define STRING_HEADER "--TWI SLAVE Example --\r\n" \
 		"-- "BOARD_NAME" --\r\n" \
 		"-- Compiled: "__DATE__" "__TIME__" --"STRING_EOL
 
+/** The slave device instance*/
+typedef struct _slave_device_t {
+	/** PageAddress of the slave device*/
+	uint16_t us_page_address;
+	/** Offset of the memory access*/
+	uint16_t us_offset_memory;
+	/** Read address of the request*/
+	uint8_t uc_acquire_address;
+	/** Memory buffer*/
+	uint8_t uc_memory[MEMORY_SIZE];
+} slave_device_t;
 
-#if SAMG55
-/** TWI ID for simulated EEPROM application to use */
-#define BOARD_ID_TWI_EEPROM         ID_TWI4
-/** TWI Base for simulated TWI EEPROM application to use */
-#define BOARD_BASE_TWI_EEPROM       TWI4
-/** The address for simulated TWI EEPROM application */
-#undef  AT24C_ADDRESS
-#define AT24C_ADDRESS        0x40
-#endif
+slave_device_t emulate_driver;
 
-static const uint8_t test_data_tx[] = {
-	/** SAM TWI EEPROM EXAMPLE */
-	'S', 'A', 'M', ' ', 'T', 'W', 'I', ' ',
-	'E', 'E', 'P', 'R', 'O', 'M', ' ',
-	'E', 'X', 'A', 'M', 'P', 'L', 'E'
-};
-
-/** Reception buffer */
-static uint8_t gs_uc_test_data_rx[TEST_DATA_LENGTH] = { 0 };
-
-/** Global timestamp in milliseconds since start of application */
-volatile uint32_t g_ul_ms_ticks = 0;
-
-/**
- *  \brief Handler for System Tick interrupt.
- *
- *  Process System Tick Event
- *  increments the timestamp counter.
- */
-void SysTick_Handler(void)
+void BOARD_TWI_Handler(void)
 {
-	g_ul_ms_ticks++;
+	uint32_t status;
+
+	status = twi_get_interrupt_status(BOARD_BASE_TWI_SLAVE);
+
+	if (((status & TWI_SR_SVACC) == TWI_SR_SVACC)
+			&& (emulate_driver.uc_acquire_address == 0)) {
+		twi_disable_interrupt(BOARD_BASE_TWI_SLAVE, TWI_IDR_SVACC);
+		twi_enable_interrupt(BOARD_BASE_TWI_SLAVE, TWI_IER_RXRDY | TWI_IER_GACC
+				| TWI_IER_NACK | TWI_IER_EOSACC | TWI_IER_SCL_WS);
+		emulate_driver.uc_acquire_address++;
+		emulate_driver.us_page_address = 0;
+		emulate_driver.us_offset_memory = 0;
+	}
+
+	if ((status & TWI_SR_GACC) == TWI_SR_GACC) {
+		puts("General Call Treatment\n\r");
+		puts("not treated");
+	}
+
+	if (((status & TWI_SR_SVACC) == TWI_SR_SVACC) && ((status & TWI_SR_GACC) == 0)
+			&& ((status & TWI_SR_RXRDY) == TWI_SR_RXRDY)) {
+
+		if (emulate_driver.uc_acquire_address == 1) {
+			/* Acquire MSB address */
+			emulate_driver.us_page_address =
+					(twi_read_byte(BOARD_BASE_TWI_SLAVE) & 0xFF) << 8;
+			emulate_driver.uc_acquire_address++;
+		} else {
+			if (emulate_driver.uc_acquire_address == 2) {
+				/* Acquire LSB address */
+				emulate_driver.us_page_address |=
+						(twi_read_byte(BOARD_BASE_TWI_SLAVE) & 0xFF);
+				emulate_driver.uc_acquire_address++;
+			} else {
+				/* Read one byte of data from master to slave device */
+				emulate_driver.uc_memory[emulate_driver.us_page_address +
+					emulate_driver.us_offset_memory] =
+						(twi_read_byte(BOARD_BASE_TWI_SLAVE) & 0xFF);
+
+				emulate_driver.us_offset_memory++;
+			}
+		}
+	} else {
+		if (((status & TWI_SR_TXRDY) == TWI_SR_TXRDY)
+				&& ((status & TWI_SR_TXCOMP) == TWI_SR_TXCOMP)
+				&& ((status & TWI_SR_EOSACC) == TWI_SR_EOSACC)) {
+			/* End of transfer, end of slave access */
+			emulate_driver.us_offset_memory = 0;
+			emulate_driver.uc_acquire_address = 0;
+			emulate_driver.us_page_address = 0;
+			twi_enable_interrupt(BOARD_BASE_TWI_SLAVE, TWI_SR_SVACC);
+			twi_disable_interrupt(BOARD_BASE_TWI_SLAVE,
+					TWI_IDR_RXRDY | TWI_IDR_GACC |
+					TWI_IDR_NACK | TWI_IDR_EOSACC | TWI_IDR_SCL_WS);
+		} else {
+			if (((status & TWI_SR_SVACC) == TWI_SR_SVACC)
+					&& ((status & TWI_SR_GACC) == 0)
+					&& (emulate_driver.uc_acquire_address == 3)
+					&& ((status & TWI_SR_SVREAD) == TWI_SR_SVREAD)
+					&& ((status & TWI_SR_TXRDY) == TWI_SR_TXRDY)
+					&& ((status & TWI_SR_NACK) == 0)) {
+				/* Write one byte of data from slave to master device */
+				twi_write_byte(BOARD_BASE_TWI_SLAVE,
+						emulate_driver.uc_memory[emulate_driver.us_page_address
+						+ emulate_driver.us_offset_memory]);
+				emulate_driver.us_offset_memory++;
+			}
+		}
+	}
 }
 
 /**
@@ -85,31 +226,22 @@ static void configure_console(void)
 }
 
 /**
- *  \brief Wait for the given number of milliseconds (using the dwTimeStamp
- *         generated by the SAM microcontrollers' system tick).
- *  \param ul_dly_ticks  Delay to wait for, in milliseconds.
- */
-static void mdelay(uint32_t ul_dly_ticks)
-{
-	uint32_t ul_cur_ticks;
-
-	ul_cur_ticks = g_ul_ms_ticks;
-	while ((g_ul_ms_ticks - ul_cur_ticks) < ul_dly_ticks);
-}
-
-/**
- * \brief Application entry point for TWI EEPROM example.
+ * \brief Application entry point for TWI Slave example.
  *
  * \return Unused (ANSI-C compatibility).
  */
 int main(void)
 {
 	uint32_t i;
-	twi_options_t opt;
-	twi_packet_t packet_tx, packet_rx;
 
 	/* Initialize the SAM system */
 	sysclk_init();
+
+#if (SAM4S || SAM4E)
+	/* Select PB4 and PB5 function, this will cause JTAG discconnect */
+	REG_CCFG_SYSIO |= CCFG_SYSIO_SYSIO4;
+	REG_CCFG_SYSIO |= CCFG_SYSIO_SYSIO5;
+#endif
 
 	/* Initialize the board */
 	board_init();
@@ -120,98 +252,36 @@ int main(void)
 	/* Output example information */
 	puts(STRING_HEADER);
 
-	/* Configure systick for 1 ms */
-	puts("Configure system tick to get 1ms tick period.\r");
-	if (SysTick_Config(sysclk_get_cpu_hz() / 1000)) {
-		puts("-E- Systick configuration error\r");
-		while (1) {
-			/* Capture error */
-		}
-	}
-
-	/* Enable the peripheral clock for TWI */
-	pmc_enable_periph_clk(BOARD_ID_TWI_EEPROM);
-
-	/* Configure the options of TWI driver */
-	opt.master_clk = sysclk_get_peripheral_hz();
-	opt.speed      = TWI_CLK;
-
-	/* Configure the data packet to be transmitted */
-	packet_tx.chip        = AT24C_ADDRESS;
-	packet_tx.addr[0]     = EEPROM_MEM_ADDR >> 8;
-	packet_tx.addr[1]     = EEPROM_MEM_ADDR;
-	packet_tx.addr_length = EEPROM_MEM_ADDR_LENGTH;
-	packet_tx.buffer      = (uint8_t *) test_data_tx;
-	packet_tx.length      = TEST_DATA_LENGTH;
-
-	/* Configure the data packet to be received */
-	packet_rx.chip        = packet_tx.chip;
-	packet_rx.addr[0]     = packet_tx.addr[0];
-	packet_rx.addr[1]     = packet_tx.addr[1];
-	packet_rx.addr_length = packet_tx.addr_length;
-	packet_rx.buffer      = gs_uc_test_data_rx;
-	packet_rx.length      = packet_tx.length;
-
-	if (twi_master_init(BOARD_BASE_TWI_EEPROM, &opt) != TWI_SUCCESS) {
-		puts("-E-\tTWI master initialization failed.\r");
-#if SAM3XA
-		LED_On(LED0_GPIO);
-		LED_On(LED1_GPIO);
-#endif
-		while (1) {
-			/* Capture error */
-		}
-	}
-
-	/* Send test pattern to EEPROM */
-	if (twi_master_write(BOARD_BASE_TWI_EEPROM, &packet_tx) != TWI_SUCCESS) {
-		puts("-E-\tTWI master write packet failed.\r");
-#if SAM3XA
-		LED_On(LED0_GPIO);
-		LED_On(LED1_GPIO);
-#endif
-		while (1) {
-			/* Capture error */
-		}
-	}
-	printf("Write:\tOK!\n\r");
-
-	/* Wait at least 10 ms */
-	mdelay(WAIT_TIME);
-
-	/* Get memory from EEPROM */
-	if (twi_master_read(BOARD_BASE_TWI_EEPROM, &packet_rx) != TWI_SUCCESS) {
-		puts("-E-\tTWI master read packet failed.\r");
-#if SAM3XA
-		LED_On(LED0_GPIO);
-		LED_On(LED1_GPIO);
-#endif
-		while (1) {
-			/* Capture error */
-		}
-	}
-	puts("Read:\tOK!\r");
-
-	/* Compare the sent and the received */
-	for (i = 0; i < TEST_DATA_LENGTH; i++) {
-		if (test_data_tx[i] != gs_uc_test_data_rx[i]) {
-			/* No match */
-			puts("Data comparison:\tUnmatched!\r");
-#if SAM3XA
-			LED_On(LED0_GPIO);
-#endif
-			while (1) {
-				/* Capture error */
-			}
-		}
-	}
-	/* Match */
-	puts("Data comparison:\tMatched!\r");
-#if SAM3XA
-	LED_On(LED1_GPIO);
+#if (SAMG55)
+	/* Enable the peripheral and set TWI mode. */
+	flexcom_enable(BOARD_FLEXCOM_TWI);
+	flexcom_set_opmode(BOARD_FLEXCOM_TWI, FLEXCOM_TWI);
 #else
-	LED_On(LED0);
+	/* Enable the peripheral clock for TWI */
+	pmc_enable_periph_clk(BOARD_ID_TWI_SLAVE);
 #endif
+
+	for (i = 0; i < MEMORY_SIZE; i++) {
+		emulate_driver.uc_memory[i] = 0;
+	}
+	emulate_driver.us_offset_memory = 0;
+	emulate_driver.uc_acquire_address = 0;
+	emulate_driver.us_page_address = 0;
+
+	/* Configure TWI as slave */
+	puts("-I- Configuring the TWI in slave mode\n\r");
+	twi_slave_init(BOARD_BASE_TWI_SLAVE, SLAVE_ADDRESS);
+
+	/* Clear receipt buffer */
+	twi_read_byte(BOARD_BASE_TWI_SLAVE);
+
+	/* Configure TWI interrupts */
+	NVIC_DisableIRQ(BOARD_TWI_IRQn);
+	NVIC_ClearPendingIRQ(BOARD_TWI_IRQn);
+	NVIC_SetPriority(BOARD_TWI_IRQn, 0);
+	NVIC_EnableIRQ(BOARD_TWI_IRQn);
+	twi_enable_interrupt(BOARD_BASE_TWI_SLAVE, TWI_SR_SVACC);
+
 	while (1) {
 	}
 }
