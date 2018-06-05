@@ -2,6 +2,7 @@
 #include "stdio_serial.h"
 #include "conf_board.h"
 #include "conf_clock.h"
+#include <string.h>
 
 #define ILI93XX_LCD_CS      1
 
@@ -51,7 +52,7 @@
 struct ili93xx_opt_t g_ili93xx_display_opt;
 
 uint32_t	escuro_max = TEMPO_MAX_ESCURO;
-uint32_t	escuro = TEMPO_MAX_ESCURO;
+int32_t	escuro = TEMPO_MAX_ESCURO;
 uint32_t	luz_min = 50;	//Luz minima em %
 uint32_t	duty_cycle = INIT_DUTY_VALUE;
 uint32_t	max_aceso = 10;	//Tempo maximo com a luz acesa
@@ -122,9 +123,8 @@ void ADC_Handler(void)
 		
 		//exibição do último valor
 		char buffer[30];
-		sprintf (buffer, "LDR: %d", result);
+		sprintf (buffer, "LDR: %d\r", result);
 		puts(buffer);
-		puts("\r");
 		
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(0, 150, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
@@ -136,9 +136,8 @@ void ADC_Handler(void)
 			escuro -= tempo_entre_medicoes;
 		else
 			escuro = escuro_max;
-		sprintf (buffer, "Escuro: %d", escuro);
+		sprintf (buffer, "Escuro: %d\r", escuro);
 		puts(buffer);
-		puts("\r");
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(0, 171, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
 		ili93xx_set_foreground_color(COLOR_BLACK);
@@ -156,14 +155,14 @@ void ADC_Handler(void)
 		result = adc_get_channel_value(ADC, ADC_CHANNEL_UMIDADE);
 		
 		char buffer[30];
-		sprintf (buffer, "Umidade: %d", result);
+		sprintf (buffer, "Umidade: %d\r", result);
 		puts(buffer);
-		puts("\r");
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(0, 192, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
 		ili93xx_set_foreground_color(COLOR_BLACK);
 		ili93xx_draw_string(5, 197, (uint8_t*) buffer);
 		
+		// Ligar a bomba baseado na umidade
 		if (result <= UMIDADE_MINIMA)
 		{
 			duty_cycle = 4095;
@@ -189,15 +188,17 @@ void ADC_Handler(void)
 
 void configuracoes_gerais()
 {
-	char buffer[255];
+	char buffer[255], a;
 	puts("Insira tempo maximo no escuro em horas:\r");
 	escuro_max = getchar();
+	escuro_max -= 48;
 	escuro_max *= 3600;
 	puts("Insira a luminosidade minima em \%:\r");
 	luz_min = getchar();
+	luz_min -= 48;
 	luz_min *= 10;
 	puts("Configuracao completa!\r");
-	sprintf(buffer,"Tempo: %i\tLuz: %i\%\n\r", escuro, luz_min);
+	sprintf(buffer,"Tempo: %i\tLuz: %i\%\n\r", escuro_max, luz_min);
 	puts(buffer);
 }
 
@@ -286,15 +287,14 @@ int main (void)
 	sysclk_init();
 	board_init();
 	inicializacao_UART();
+	configuracoes_gerais();
 	configure_adc();
 	configure_pwm();
 	configure_lcd();
 	tc_config(1);
-	
+
 	pio_set_output(PIOA, PINO_LED_AZUL, HIGH, DISABLE, ENABLE);
 	pio_set_output(PIOA, PINO_LED_VERDE, HIGH, DISABLE, ENABLE);
-
-//	configuracoes_gerais();
 
 	while(1)
 	{

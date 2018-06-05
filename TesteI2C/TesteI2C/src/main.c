@@ -1,9 +1,8 @@
 #include <asf.h>
 
-#define TWI_CLK	400000
-#define ENDERECO_SENSOR	0b1101000
-#define COMANDO_LEITURA_1	0x3B
-#define COMANDO_LEITURA_2	0x3C
+#define TWI_CLK	200000
+#define ENDERECO_SENSOR	0x68
+#define COMANDO_LEITURA_1	0x3b
 
 #define ILI93XX_LCD_CS      1
 
@@ -60,29 +59,49 @@ int main (void)
 	sysclk_init();
 	board_init();
 	configure_lcd();
+
+	pio_configure(PIOB, PIO_PERIPH_B, (PIO_PB5A_TWCK1 | PIO_PB4A_TWD1), PIO_OPENDRAIN);
 	
-	pmc_enable_periph_clk(ID_TWI0);
+	pmc_enable_periph_clk(ID_TWI1);
+
 	opt.master_clk = sysclk_get_peripheral_hz();
 	opt.speed      = TWI_CLK;
-	twi_enable_master_mode(TWI0);
-	twi_master_init(TWI0, &opt);
+	twi_enable_master_mode(TWI1);
+	twi_master_init(TWI1, &opt);
 	
 	twi_packet_t	pacote;
 	uint8_t	resposta[20];
 
+	resposta[0]=0x00;
+
+	//pacote.addr[0] = 0x6b;
+	//pacote.addr_length = 1;
+	//pacote.buffer = &resposta;
+	//pacote.chip = ENDERECO_SENSOR;
+	//pacote.length = 1;
+//
+	//if(twi_master_write(TWI1, &pacote) == TWI_SUCCESS)
+	//{
+		//ili93xx_set_foreground_color(COLOR_WHITE);
+		//ili93xx_draw_filled_rectangle(0, 0, 200, 200);
+		//ili93xx_set_foreground_color(COLOR_BLACK);
+		//ili93xx_draw_string(0, 0, "Enviou");
+	//}
+
 	while(1)
 	{
 		pacote.addr[0] = COMANDO_LEITURA_1;
-		pacote.addr[1] = COMANDO_LEITURA_2;
-		pacote.addr_length = 2;
-		pacote.buffer = &resposta;
+		pacote.addr_length = 1;
+		pacote.buffer = &resposta;		
 		pacote.chip = ENDERECO_SENSOR;
-		pacote.length = 2;
-		
-		twi_master_read(TWI0, &pacote);
+		pacote.length = 14;
+
+		twi_master_read(TWI1, &pacote);
 		
 		char	a[20];
-		sprintf(a,"%d",resposta);
+		int16_t	b;
+		b = (resposta[2] << 8 | resposta[3]);
+		sprintf(a,"%i",b);
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(95, 175, 240, 200);
 		ili93xx_set_foreground_color(COLOR_BLACK);
