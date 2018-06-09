@@ -59,18 +59,6 @@ uint32_t	max_aceso = 10;	//Tempo maximo com a luz acesa
 uint32_t	tempo_entre_medicoes = INTERVALO_MEDICAO;
 uint32_t	tempo_prox_medicao = INTERVALO_MEDICAO;
 
-void inicializacao_UART (){
-	
-	static usart_serial_options_t usart_options = {
-		.baudrate = CONF_UART_BAUDRATE,
-		.charlength = CONF_UART_CHAR_LENGTH,
-		.paritytype = CONF_UART_PARITY,
-		.stopbits = CONF_UART_STOP_BITS
-	};
-	usart_serial_init(CONF_UART, &usart_options);
-	stdio_serial_init((Usart *)CONF_UART, &usart_options);
-}
-
 static void tc_config(uint32_t freq_desejada)
 {
 	uint32_t ul_div;
@@ -282,12 +270,56 @@ void configure_lcd()
 	ili93xx_set_cursor_position(0, 0);
 }
 
+
+void inicializacao_UART (){
+	static usart_serial_options_t usart_options = {
+		.baudrate = CONF_UART_BAUDRATE,
+		.charlength = CONF_UART_CHAR_LENGTH,
+		.paritytype = CONF_UART_PARITY,
+		.stopbits = CONF_UART_STOP_BITS
+	};
+	usart_serial_init(CONF_UART, &usart_options);
+	stdio_serial_init((Usart *)CONF_UART, &usart_options);
+	configuracoes_gerais();
+	NVIC_SetPriority( UART0_IRQn, 5);
+	NVIC_EnableIRQ( UART0_IRQn);
+	uart_enable_interrupt(UART0, UART_IER_RXRDY);
+}
+
+void UART0_Handler()
+{
+	/* Get UART status and check if PDC receive buffer is full */
+	if ((uart_get_status(UART0) & UART_IER_RXRDY) == UART_IER_RXRDY)
+	{
+		char key;
+		uart_read(UART0, &key);
+		switch (key)
+		{
+			case 'c':
+			configuracoes_gerais();
+			break;
+			case 'b':
+			duty_cycle = 4095;
+			PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
+			if (tempo_entre_medicoes != INTERVALO_ATIVO)
+			{
+				tempo_entre_medicoes = INTERVALO_ATIVO;
+				tempo_prox_medicao = tempo_entre_medicoes;
+			}
+			puts("Bomba iniciada\r");
+			break;
+			case 'm':
+			adc_start(ADC);
+		}
+	}
+}
+
 int main (void)
 {
 	sysclk_init();
 	board_init();
 	inicializacao_UART();
-	configuracoes_gerais();
+//	configuracoes_gerais();
 	configure_adc();
 	configure_pwm();
 	configure_lcd();

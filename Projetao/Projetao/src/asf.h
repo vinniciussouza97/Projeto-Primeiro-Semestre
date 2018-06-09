@@ -59,6 +59,9 @@
 #include <compiler.h>
 #include <status_codes.h>
 
+// From module: Delay routines
+#include <delay.h>
+
 // From module: Display - AAT31XX Backlight Controller
 #include <aat31xx.h>
 
