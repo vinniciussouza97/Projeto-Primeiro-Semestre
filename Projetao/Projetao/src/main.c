@@ -6,21 +6,25 @@
 
 #define ILI93XX_LCD_CS      1
 
+//Configurações da UART
 #define CONF_UART              UART0
 #define CONF_UART_BAUDRATE     9600
 #define CONF_UART_CHAR_LENGTH  US_MR_CHRL_8_BIT
 #define CONF_UART_PARITY       US_MR_PAR_NO
 #define CONF_UART_STOP_BITS    US_MR_NBSTOP_1_BIT
 
+//Pinos dos LEDs
 #define	PINO_LED_AZUL	PIO_PA19
 #define PINO_LED_VERDE	PIO_PA20
 
+//Configurações do Timer
 #define TC			TC0
 #define CHANNEL		0
 #define ID_TC		ID_TC0
 #define TC_Handler  TC0_Handler
 #define TC_IRQn     TC0_IRQn
 
+//Configurações do ADC
 #define VOLT_REF        (3300)
 #define TRACKING_TIME    15
 #define TRANSFER_PERIOD  2
@@ -31,7 +35,7 @@
 #define ADC_CHANNEL_UMIDADE	0	//Sensor de umidade do solo PA17
 #define ADC_ISR_UMIDADE	ADC_ISR_EOC0
 
-#define UMIDADE_MINIMA	3700	// Quanto maior, mais seco
+#define UMIDADE_MINIMA	3700	//Umidade mínima do solo. Quanto maior, mais seco
 
 #define PWM_FREQUENCY	1000	/** PWM frequency in Hz */
 #define PERIOD_VALUE	4096	/** Period value of PWM output waveform */
@@ -42,23 +46,25 @@
 #define PIN_BOMBA_ABCDSR	PIO_ABCDSR_P13
 #define PIO_BOMBA	PIOA
 
-#define PIO_HUM	PIOA
-#define PINO_HUM	PIO_PA14
+#define PIO_HUM	PIOA	//PIO do sensor de umidade do solo
+#define PINO_HUM	PIO_PA14	//Pino do sensor
 
-#define TEMPO_MAX_ESCURO	30
-#define INTERVALO_MEDICAO	10
-#define INTERVALO_ATIVO	1
+#define TEMPO_MAX_ESCURO	30	//Tempo máximo na escuridão
+#define INTERVALO_MEDICAO	10	//Intervalo entre medições com a bomba desligada
+#define INTERVALO_ATIVO	1	//Intervalo entre medições com a bomba ligada
 
-struct ili93xx_opt_t g_ili93xx_display_opt;
+struct ili93xx_opt_t g_ili93xx_display_opt;	//Display LCD
 
+//Algumas variáveis globais para uso em múltiplas funções
 uint32_t	escuro_max = TEMPO_MAX_ESCURO;
-int32_t	escuro = TEMPO_MAX_ESCURO;
+int32_t	escuro = TEMPO_MAX_ESCURO;	//Quando "escuro" chega em 0, o LED é aceso
 uint32_t	luz_min = 50;	//Luz minima em %
 uint32_t	duty_cycle = INIT_DUTY_VALUE;
-uint32_t	max_aceso = 10;	//Tempo maximo com a luz acesa
+int32_t	max_aceso = 8*3600;	//Tempo maximo com a luz acesa
 uint32_t	tempo_entre_medicoes = INTERVALO_MEDICAO;
 uint32_t	tempo_prox_medicao = INTERVALO_MEDICAO;
 
+//Configurações do TC
 static void tc_config(uint32_t freq_desejada)
 {
 	uint32_t ul_div;
@@ -79,18 +85,21 @@ static void tc_config(uint32_t freq_desejada)
 	tc_start(TC, CHANNEL);
 }
 
+//ISR do TC
 void TC_Handler(void)
 {
 	tc_get_status(TC,CHANNEL);
 	LED_Toggle(LED0_GPIO);
-	tempo_prox_medicao--;
+	tempo_prox_medicao--;	//Contagens ocorrem apenas após um intervalo
 	
+	//Reiniciar contagem, iniciar ADC
 	if (tempo_prox_medicao <= 0)
 	{
 		adc_start(ADC);
 		tempo_prox_medicao = tempo_entre_medicoes;
 	}
 	
+	//Print de tempos de medição
 	char buffer[100];
 	sprintf(buffer, "Entre medicoes: %d\nProx medicao: %d\n", tempo_entre_medicoes, tempo_prox_medicao);
 
@@ -105,15 +114,17 @@ void ADC_Handler(void)
 {
 	uint16_t result;
 
+	//Tratamento do LDR
 	if (adc_get_status(ADC) & ADC_ISR_LDR)
 	{
 		result = adc_get_channel_value(ADC, ADC_CHANNEL_LDR);
 		
 		//exibição do último valor
 		char buffer[30];
-		sprintf (buffer, "LDR: %d\r", result);
+		sprintf (buffer, "LDR: %d", result);
 		puts(buffer);
 		
+		//Print no LCD
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(0, 150, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
 		ili93xx_set_foreground_color(COLOR_BLACK);
@@ -124,26 +135,31 @@ void ADC_Handler(void)
 			escuro -= tempo_entre_medicoes;
 		else
 			escuro = escuro_max;
-		sprintf (buffer, "Escuro: %d\r", escuro);
+		sprintf (buffer, "Escuro: %d", escuro);
 		puts(buffer);
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(0, 171, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
 		ili93xx_set_foreground_color(COLOR_BLACK);
 		ili93xx_draw_string(5, 176, (uint8_t*) buffer);
 		
-		if (escuro <= 0)
+		if (escuro <= -max_aceso)
+		{
+			pio_set(PIOA, PINO_LED_VERDE);
+			escuro = escuro_max;
+		}
+		else if (escuro <= 0)
 			pio_clear(PIOA, PINO_LED_VERDE);
 		else
 			pio_set(PIOA, PINO_LED_VERDE);
-		// (escuro <= -max_aceso)
-			//pio_set(PIOA, PINO_LED_VERDE);	
+
 	}
+	//Tratamento do sensor de umidade do solo
 	else if (adc_get_status(ADC) & ADC_ISR_UMIDADE)
 	{
 		result = adc_get_channel_value(ADC, ADC_CHANNEL_UMIDADE);
 		
 		char buffer[30];
-		sprintf (buffer, "Umidade: %d\r", result);
+		sprintf (buffer, "Umidade: %d", result);
 		puts(buffer);
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(0, 192, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
@@ -161,6 +177,7 @@ void ADC_Handler(void)
 				tempo_prox_medicao = tempo_entre_medicoes;
 			}
 		}
+		//Desligar bomba
 		else
 		{
 			duty_cycle = 0;
@@ -172,8 +189,24 @@ void ADC_Handler(void)
 			}
 		}
 	}
+	//Tratamento do sensor de temperatura embutido
+	else if (adc_get_status(ADC) & ADC_ISR_EOC15)
+	{
+		result = adc_get_channel_value(ADC, ADC_TEMPERATURE_SENSOR);
+		
+		//Cálculo da temperatura atual, vide Datasheet
+		float	temp = (float)(result*VOLT_REF/MAX_DIGITAL - 1440) * 0.21276 + 27.0;
+		char buffer[30];
+		sprintf(buffer, "Temperatura: %.1f", temp);
+		puts(buffer);
+		ili93xx_set_foreground_color(COLOR_WHITE);
+		ili93xx_draw_filled_rectangle(0, 213, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
+		ili93xx_set_foreground_color(COLOR_BLACK);
+		ili93xx_draw_string(5, 218, (uint8_t*) buffer);
+	}
 }
 
+//Função de configuração para a temporização e medição do LDR
 void configuracoes_gerais()
 {
 	char buffer[255], a;
@@ -181,15 +214,21 @@ void configuracoes_gerais()
 	escuro_max = getchar();
 	escuro_max -= 48;
 	escuro_max *= 3600;
+	escuro = escuro_max;
 	puts("Insira a luminosidade minima em \%:\r");
 	luz_min = getchar();
 	luz_min -= 48;
 	luz_min *= 10;
+	puts("Insira o tempo maximo com a luz acesa em horas\r");
+	max_aceso = getchar();
+	max_aceso -= 48;
+	max_aceso *= 3600;
 	puts("Configuracao completa!\r");
-	sprintf(buffer,"Tempo: %i\tLuz: %i\%\n\r", escuro_max, luz_min);
+	sprintf(buffer,"Tempo: %i\tLuz: %i\%\tAceso: %i\n\r", escuro_max, luz_min, max_aceso);
 	puts(buffer);
 }
 
+//Configurações do ADC
 void configure_adc(void)
 {
 	/* Enable peripheral clock. */
@@ -200,12 +239,16 @@ void configure_adc(void)
 	adc_configure_trigger(ADC, ADC_TRIG_SW, 0);
 	adc_enable_channel(ADC, ADC_CHANNEL_LDR);
 	adc_enable_channel(ADC, ADC_CHANNEL_UMIDADE);
+	adc_enable_channel(ADC, ADC_TEMPERATURE_SENSOR);
 	NVIC_SetPriority(ADC_IRQn, 5);
 	NVIC_EnableIRQ(ADC_IRQn);
 	adc_enable_interrupt(ADC, ADC_ISR_LDR);
 	adc_enable_interrupt(ADC, ADC_ISR_UMIDADE);
+	adc_enable_interrupt(ADC, ADC_ISR_EOC15);
+	ADC->ADC_ACR |= ADC_ACR_TSON;	//Ativação do sensor de temperatura embutido
 }
 
+//Configuração do PWM
 void configure_pwm(void)
 {
 	// disable the PIO (peripheral controls the pin)
@@ -225,6 +268,7 @@ void configure_pwm(void)
 	PWM->PWM_ENA = PWM_CHANNEL_BOMBA_EN;
 }
 
+//Configuração do LCD
 void configure_lcd()
 {
 	/** Enable peripheral clock */
@@ -270,7 +314,7 @@ void configure_lcd()
 	ili93xx_set_cursor_position(0, 0);
 }
 
-
+//Configuração da UART
 void inicializacao_UART (){
 	static usart_serial_options_t usart_options = {
 		.baudrate = CONF_UART_BAUDRATE,
@@ -286,6 +330,7 @@ void inicializacao_UART (){
 	uart_enable_interrupt(UART0, UART_IER_RXRDY);
 }
 
+//Comandos UART
 void UART0_Handler()
 {
 	/* Get UART status and check if PDC receive buffer is full */
@@ -295,20 +340,20 @@ void UART0_Handler()
 		uart_read(UART0, &key);
 		switch (key)
 		{
-			case 'c':
-			configuracoes_gerais();
-			break;
-			case 'b':
-			duty_cycle = 4095;
-			PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
-			if (tempo_entre_medicoes != INTERVALO_ATIVO)
-			{
-				tempo_entre_medicoes = INTERVALO_ATIVO;
-				tempo_prox_medicao = tempo_entre_medicoes;
-			}
-			puts("Bomba iniciada\r");
-			break;
-			case 'm':
+			case 'c':	//Com a letra 'c', abre-se o menu de configurações gerais
+				configuracoes_gerais();
+				break;
+			case 'b':	//Com a letra 'b', aciona-se a bomba manualmente
+				duty_cycle = 4095;
+				PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
+				if (tempo_entre_medicoes != INTERVALO_ATIVO)
+				{
+					tempo_entre_medicoes = INTERVALO_ATIVO;
+					tempo_prox_medicao = tempo_entre_medicoes;
+				}
+				puts("Bomba iniciada\r");
+				break;
+			case 'm':	//Com a letra 'm', as medições atuais são enviadas para o Bluetooth
 			adc_start(ADC);
 		}
 	}
@@ -319,7 +364,6 @@ int main (void)
 	sysclk_init();
 	board_init();
 	inicializacao_UART();
-//	configuracoes_gerais();
 	configure_adc();
 	configure_pwm();
 	configure_lcd();

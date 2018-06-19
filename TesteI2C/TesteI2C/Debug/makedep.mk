@@ -4,6 +4,12 @@
 
 src\ASF\common\services\delay\sam\cycle_counter.c
 
+src\ASF\common\services\serial\usart_serial.c
+
+src\ASF\common\utils\stdio\read.c
+
+src\ASF\common\utils\stdio\write.c
+
 src\ASF\sam\components\display\aat31xx\aat31xx.c
 
 src\ASF\sam\components\display\ili93xx\ili93xx.c
@@ -27,6 +33,10 @@ src\ASF\sam\drivers\pio\pio_handler.c
 src\ASF\sam\drivers\pmc\pmc.c
 
 src\ASF\sam\drivers\pmc\sleep.c
+
+src\ASF\sam\drivers\uart\uart.c
+
+src\ASF\sam\drivers\usart\usart.c
 
 src\ASF\sam\utils\cmsis\sam4s\source\templates\gcc\startup_sam4s.c
 
