@@ -46,9 +46,6 @@
 #define PIN_BOMBA_ABCDSR	PIO_ABCDSR_P13
 #define PIO_BOMBA	PIOA
 
-#define PIO_HUM	PIOA	//PIO do sensor de umidade do solo
-#define PINO_HUM	PIO_PA14	//Pino do sensor
-
 #define TEMPO_MAX_ESCURO	30	//Tempo máximo na escuridão
 #define INTERVALO_MEDICAO	10	//Intervalo entre medições com a bomba desligada
 #define INTERVALO_ATIVO	1	//Intervalo entre medições com a bomba ligada
@@ -167,9 +164,9 @@ void ADC_Handler(void)
 		ili93xx_draw_string(5, 197, (uint8_t*) buffer);
 		
 		// Ligar a bomba baseado na umidade
-		if (result <= UMIDADE_MINIMA)
+		if (result >= UMIDADE_MINIMA)
 		{
-			duty_cycle = 4095;
+			duty_cycle = 0;
 			PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
 			if (tempo_entre_medicoes != INTERVALO_ATIVO)
 			{
@@ -180,7 +177,7 @@ void ADC_Handler(void)
 		//Desligar bomba
 		else
 		{
-			duty_cycle = 0;
+			duty_cycle = 4095;
 			PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
 			if (tempo_entre_medicoes != INTERVALO_MEDICAO)
 			{
@@ -344,7 +341,7 @@ void UART0_Handler()
 				configuracoes_gerais();
 				break;
 			case 'b':	//Com a letra 'b', aciona-se a bomba manualmente
-				duty_cycle = 4095;
+				duty_cycle = 0;
 				PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
 				if (tempo_entre_medicoes != INTERVALO_ATIVO)
 				{
@@ -354,7 +351,8 @@ void UART0_Handler()
 				puts("Bomba iniciada\r");
 				break;
 			case 'm':	//Com a letra 'm', as medições atuais são enviadas para o Bluetooth
-			adc_start(ADC);
+				adc_start(ADC);
+				break;
 		}
 	}
 }
