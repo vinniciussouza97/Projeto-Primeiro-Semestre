@@ -35,7 +35,7 @@
 #define ADC_CHANNEL_UMIDADE	0	//Sensor de umidade do solo PA17
 #define ADC_ISR_UMIDADE	ADC_ISR_EOC0
 
-#define UMIDADE_MINIMA	3700	//Umidade mínima do solo. Quanto maior, mais seco
+#define UMIDADE_MINIMA	3200	//Umidade mínima do solo. Quanto maior, mais seco
 
 #define PWM_FREQUENCY	1000	/** PWM frequency in Hz */
 #define PERIOD_VALUE	4096	/** Period value of PWM output waveform */

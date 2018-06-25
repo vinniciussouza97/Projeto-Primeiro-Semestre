@@ -4344,7 +4344,7 @@ void ADC_Handler(void)
   4017f2:	4b4a      	ldr	r3, [pc, #296]	; (40191c <ADC_Handler+0x20c>)
   4017f4:	4798      	blx	r3
   4017f6:	f010 0f01 	tst.w	r0, #1
-  4017fa:	d043      	beq.n	401884 <ADC_Handler+0x174>
+  4017fa:	d042      	beq.n	401882 <ADC_Handler+0x172>
 		result = adc_get_channel_value(ADC, ADC_CHANNEL_UMIDADE);
   4017fc:	2100      	movs	r1, #0
   4017fe:	4846      	ldr	r0, [pc, #280]	; (401918 <ADC_Handler+0x208>)
@@ -4382,118 +4382,118 @@ void ADC_Handler(void)
   401836:	4b40      	ldr	r3, [pc, #256]	; (401938 <ADC_Handler+0x228>)
   401838:	4798      	blx	r3
 		if (result >= UMIDADE_MINIMA)
-  40183a:	f640 6373 	movw	r3, #3699	; 0xe73
-  40183e:	429c      	cmp	r4, r3
-  401840:	d90f      	bls.n	401862 <ADC_Handler+0x152>
+  40183a:	f5b4 6f48 	cmp.w	r4, #3200	; 0xc80
+  40183e:	d30f      	bcc.n	401860 <ADC_Handler+0x150>
 			duty_cycle = 0;
-  401842:	2300      	movs	r3, #0
-  401844:	4a48      	ldr	r2, [pc, #288]	; (401968 <ADC_Handler+0x258>)
-  401846:	6013      	str	r3, [r2, #0]
+  401840:	2300      	movs	r3, #0
+  401842:	4a49      	ldr	r2, [pc, #292]	; (401968 <ADC_Handler+0x258>)
+  401844:	6013      	str	r3, [r2, #0]
 			PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
-  401848:	4a48      	ldr	r2, [pc, #288]	; (40196c <ADC_Handler+0x25c>)
-  40184a:	f8c2 3248 	str.w	r3, [r2, #584]	; 0x248
+  401846:	4a49      	ldr	r2, [pc, #292]	; (40196c <ADC_Handler+0x25c>)
+  401848:	f8c2 3248 	str.w	r3, [r2, #584]	; 0x248
 			if (tempo_entre_medicoes != INTERVALO_ATIVO)
-  40184e:	4b3e      	ldr	r3, [pc, #248]	; (401948 <ADC_Handler+0x238>)
-  401850:	681b      	ldr	r3, [r3, #0]
-  401852:	2b01      	cmp	r3, #1
-  401854:	d0bc      	beq.n	4017d0 <ADC_Handler+0xc0>
+  40184c:	4b3e      	ldr	r3, [pc, #248]	; (401948 <ADC_Handler+0x238>)
+  40184e:	681b      	ldr	r3, [r3, #0]
+  401850:	2b01      	cmp	r3, #1
+  401852:	d0bd      	beq.n	4017d0 <ADC_Handler+0xc0>
 				tempo_entre_medicoes = INTERVALO_ATIVO;
-  401856:	2301      	movs	r3, #1
-  401858:	4a3b      	ldr	r2, [pc, #236]	; (401948 <ADC_Handler+0x238>)
-  40185a:	6013      	str	r3, [r2, #0]
+  401854:	2301      	movs	r3, #1
+  401856:	4a3c      	ldr	r2, [pc, #240]	; (401948 <ADC_Handler+0x238>)
+  401858:	6013      	str	r3, [r2, #0]
 				tempo_prox_medicao = tempo_entre_medicoes;
-  40185c:	4a44      	ldr	r2, [pc, #272]	; (401970 <ADC_Handler+0x260>)
-  40185e:	6013      	str	r3, [r2, #0]
-  401860:	e7b6      	b.n	4017d0 <ADC_Handler+0xc0>
+  40185a:	4a45      	ldr	r2, [pc, #276]	; (401970 <ADC_Handler+0x260>)
+  40185c:	6013      	str	r3, [r2, #0]
+  40185e:	e7b7      	b.n	4017d0 <ADC_Handler+0xc0>
 			duty_cycle = 4095;
-  401862:	f640 73ff 	movw	r3, #4095	; 0xfff
-  401866:	4a40      	ldr	r2, [pc, #256]	; (401968 <ADC_Handler+0x258>)
-  401868:	6013      	str	r3, [r2, #0]
+  401860:	f640 73ff 	movw	r3, #4095	; 0xfff
+  401864:	4a40      	ldr	r2, [pc, #256]	; (401968 <ADC_Handler+0x258>)
+  401866:	6013      	str	r3, [r2, #0]
 			PWM->PWM_CH_NUM[PWM_CHANNEL_BOMBA].PWM_CDTYUPD = duty_cycle;
-  40186a:	4a40      	ldr	r2, [pc, #256]	; (40196c <ADC_Handler+0x25c>)
-  40186c:	f8c2 3248 	str.w	r3, [r2, #584]	; 0x248
+  401868:	4a40      	ldr	r2, [pc, #256]	; (40196c <ADC_Handler+0x25c>)
+  40186a:	f8c2 3248 	str.w	r3, [r2, #584]	; 0x248
 			if (tempo_entre_medicoes != INTERVALO_MEDICAO)
-  401870:	4b35      	ldr	r3, [pc, #212]	; (401948 <ADC_Handler+0x238>)
-  401872:	681b      	ldr	r3, [r3, #0]
-  401874:	2b0a      	cmp	r3, #10
-  401876:	d0ab      	beq.n	4017d0 <ADC_Handler+0xc0>
+  40186e:	4b36      	ldr	r3, [pc, #216]	; (401948 <ADC_Handler+0x238>)
+  401870:	681b      	ldr	r3, [r3, #0]
+  401872:	2b0a      	cmp	r3, #10
+  401874:	d0ac      	beq.n	4017d0 <ADC_Handler+0xc0>
 				tempo_entre_medicoes = INTERVALO_MEDICAO;
-  401878:	230a      	movs	r3, #10
-  40187a:	4a33      	ldr	r2, [pc, #204]	; (401948 <ADC_Handler+0x238>)
-  40187c:	6013      	str	r3, [r2, #0]
+  401876:	230a      	movs	r3, #10
+  401878:	4a33      	ldr	r2, [pc, #204]	; (401948 <ADC_Handler+0x238>)
+  40187a:	6013      	str	r3, [r2, #0]
 				tempo_prox_medicao = tempo_entre_medicoes;
-  40187e:	4a3c      	ldr	r2, [pc, #240]	; (401970 <ADC_Handler+0x260>)
-  401880:	6013      	str	r3, [r2, #0]
-  401882:	e7a5      	b.n	4017d0 <ADC_Handler+0xc0>
+  40187c:	4a3c      	ldr	r2, [pc, #240]	; (401970 <ADC_Handler+0x260>)
+  40187e:	6013      	str	r3, [r2, #0]
+  401880:	e7a6      	b.n	4017d0 <ADC_Handler+0xc0>
 	else if (adc_get_status(ADC) & ADC_ISR_EOC15)
-  401884:	4824      	ldr	r0, [pc, #144]	; (401918 <ADC_Handler+0x208>)
-  401886:	4b25      	ldr	r3, [pc, #148]	; (40191c <ADC_Handler+0x20c>)
-  401888:	4798      	blx	r3
-  40188a:	f410 4f00 	tst.w	r0, #32768	; 0x8000
-  40188e:	d09f      	beq.n	4017d0 <ADC_Handler+0xc0>
+  401882:	4825      	ldr	r0, [pc, #148]	; (401918 <ADC_Handler+0x208>)
+  401884:	4b25      	ldr	r3, [pc, #148]	; (40191c <ADC_Handler+0x20c>)
+  401886:	4798      	blx	r3
+  401888:	f410 4f00 	tst.w	r0, #32768	; 0x8000
+  40188c:	d0a0      	beq.n	4017d0 <ADC_Handler+0xc0>
 		result = adc_get_channel_value(ADC, ADC_TEMPERATURE_SENSOR);
-  401890:	210f      	movs	r1, #15
-  401892:	4821      	ldr	r0, [pc, #132]	; (401918 <ADC_Handler+0x208>)
-  401894:	4b22      	ldr	r3, [pc, #136]	; (401920 <ADC_Handler+0x210>)
-  401896:	4798      	blx	r3
+  40188e:	210f      	movs	r1, #15
+  401890:	4821      	ldr	r0, [pc, #132]	; (401918 <ADC_Handler+0x208>)
+  401892:	4b23      	ldr	r3, [pc, #140]	; (401920 <ADC_Handler+0x210>)
+  401894:	4798      	blx	r3
 		float	temp = (float)(result*VOLT_REF/MAX_DIGITAL - 1440) * 0.21276 + 27.0;
-  401898:	b283      	uxth	r3, r0
-  40189a:	f640 40e4 	movw	r0, #3300	; 0xce4
-  40189e:	fb00 f003 	mul.w	r0, r0, r3
-  4018a2:	4b34      	ldr	r3, [pc, #208]	; (401974 <ADC_Handler+0x264>)
-  4018a4:	fb83 2300 	smull	r2, r3, r3, r0
-  4018a8:	4403      	add	r3, r0
-  4018aa:	17c0      	asrs	r0, r0, #31
-  4018ac:	ebc0 20e3 	rsb	r0, r0, r3, asr #11
-  4018b0:	f5a0 60b4 	sub.w	r0, r0, #1440	; 0x5a0
-  4018b4:	4b30      	ldr	r3, [pc, #192]	; (401978 <ADC_Handler+0x268>)
-  4018b6:	4798      	blx	r3
-  4018b8:	4c30      	ldr	r4, [pc, #192]	; (40197c <ADC_Handler+0x26c>)
-  4018ba:	47a0      	blx	r4
-  4018bc:	a314      	add	r3, pc, #80	; (adr r3, 401910 <ADC_Handler+0x200>)
-  4018be:	e9d3 2300 	ldrd	r2, r3, [r3]
-  4018c2:	4d2f      	ldr	r5, [pc, #188]	; (401980 <ADC_Handler+0x270>)
-  4018c4:	47a8      	blx	r5
-  4018c6:	2200      	movs	r2, #0
-  4018c8:	4b2e      	ldr	r3, [pc, #184]	; (401984 <ADC_Handler+0x274>)
-  4018ca:	4d2f      	ldr	r5, [pc, #188]	; (401988 <ADC_Handler+0x278>)
-  4018cc:	47a8      	blx	r5
-  4018ce:	4b2f      	ldr	r3, [pc, #188]	; (40198c <ADC_Handler+0x27c>)
-  4018d0:	4798      	blx	r3
+  401896:	b283      	uxth	r3, r0
+  401898:	f640 40e4 	movw	r0, #3300	; 0xce4
+  40189c:	fb00 f003 	mul.w	r0, r0, r3
+  4018a0:	4b34      	ldr	r3, [pc, #208]	; (401974 <ADC_Handler+0x264>)
+  4018a2:	fb83 2300 	smull	r2, r3, r3, r0
+  4018a6:	4403      	add	r3, r0
+  4018a8:	17c0      	asrs	r0, r0, #31
+  4018aa:	ebc0 20e3 	rsb	r0, r0, r3, asr #11
+  4018ae:	f5a0 60b4 	sub.w	r0, r0, #1440	; 0x5a0
+  4018b2:	4b31      	ldr	r3, [pc, #196]	; (401978 <ADC_Handler+0x268>)
+  4018b4:	4798      	blx	r3
+  4018b6:	4c31      	ldr	r4, [pc, #196]	; (40197c <ADC_Handler+0x26c>)
+  4018b8:	47a0      	blx	r4
+  4018ba:	a315      	add	r3, pc, #84	; (adr r3, 401910 <ADC_Handler+0x200>)
+  4018bc:	e9d3 2300 	ldrd	r2, r3, [r3]
+  4018c0:	4d2f      	ldr	r5, [pc, #188]	; (401980 <ADC_Handler+0x270>)
+  4018c2:	47a8      	blx	r5
+  4018c4:	2200      	movs	r2, #0
+  4018c6:	4b2f      	ldr	r3, [pc, #188]	; (401984 <ADC_Handler+0x274>)
+  4018c8:	4d2f      	ldr	r5, [pc, #188]	; (401988 <ADC_Handler+0x278>)
+  4018ca:	47a8      	blx	r5
+  4018cc:	4b2f      	ldr	r3, [pc, #188]	; (40198c <ADC_Handler+0x27c>)
+  4018ce:	4798      	blx	r3
 		sprintf(buffer, "Temperatura: %.1f", temp);
-  4018d2:	47a0      	blx	r4
-  4018d4:	4602      	mov	r2, r0
-  4018d6:	460b      	mov	r3, r1
-  4018d8:	492d      	ldr	r1, [pc, #180]	; (401990 <ADC_Handler+0x280>)
-  4018da:	4668      	mov	r0, sp
-  4018dc:	4c12      	ldr	r4, [pc, #72]	; (401928 <ADC_Handler+0x218>)
-  4018de:	47a0      	blx	r4
+  4018d0:	47a0      	blx	r4
+  4018d2:	4602      	mov	r2, r0
+  4018d4:	460b      	mov	r3, r1
+  4018d6:	492e      	ldr	r1, [pc, #184]	; (401990 <ADC_Handler+0x280>)
+  4018d8:	4668      	mov	r0, sp
+  4018da:	4c13      	ldr	r4, [pc, #76]	; (401928 <ADC_Handler+0x218>)
+  4018dc:	47a0      	blx	r4
 		puts(buffer);
-  4018e0:	4668      	mov	r0, sp
-  4018e2:	4b12      	ldr	r3, [pc, #72]	; (40192c <ADC_Handler+0x21c>)
-  4018e4:	4798      	blx	r3
+  4018de:	4668      	mov	r0, sp
+  4018e0:	4b12      	ldr	r3, [pc, #72]	; (40192c <ADC_Handler+0x21c>)
+  4018e2:	4798      	blx	r3
 		ili93xx_set_foreground_color(COLOR_WHITE);
-  4018e6:	f06f 407f 	mvn.w	r0, #4278190080	; 0xff000000
-  4018ea:	4c11      	ldr	r4, [pc, #68]	; (401930 <ADC_Handler+0x220>)
-  4018ec:	47a0      	blx	r4
+  4018e4:	f06f 407f 	mvn.w	r0, #4278190080	; 0xff000000
+  4018e8:	4c11      	ldr	r4, [pc, #68]	; (401930 <ADC_Handler+0x220>)
+  4018ea:	47a0      	blx	r4
 		ili93xx_draw_filled_rectangle(0, 213, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
-  4018ee:	f44f 73a0 	mov.w	r3, #320	; 0x140
-  4018f2:	22f0      	movs	r2, #240	; 0xf0
-  4018f4:	21d5      	movs	r1, #213	; 0xd5
-  4018f6:	2000      	movs	r0, #0
-  4018f8:	4d0e      	ldr	r5, [pc, #56]	; (401934 <ADC_Handler+0x224>)
-  4018fa:	47a8      	blx	r5
+  4018ec:	f44f 73a0 	mov.w	r3, #320	; 0x140
+  4018f0:	22f0      	movs	r2, #240	; 0xf0
+  4018f2:	21d5      	movs	r1, #213	; 0xd5
+  4018f4:	2000      	movs	r0, #0
+  4018f6:	4d0f      	ldr	r5, [pc, #60]	; (401934 <ADC_Handler+0x224>)
+  4018f8:	47a8      	blx	r5
 		ili93xx_set_foreground_color(COLOR_BLACK);
-  4018fc:	2000      	movs	r0, #0
-  4018fe:	47a0      	blx	r4
+  4018fa:	2000      	movs	r0, #0
+  4018fc:	47a0      	blx	r4
 		ili93xx_draw_string(5, 218, (uint8_t*) buffer);
-  401900:	466a      	mov	r2, sp
-  401902:	21da      	movs	r1, #218	; 0xda
-  401904:	2005      	movs	r0, #5
-  401906:	4b0c      	ldr	r3, [pc, #48]	; (401938 <ADC_Handler+0x228>)
-  401908:	4798      	blx	r3
+  4018fe:	466a      	mov	r2, sp
+  401900:	21da      	movs	r1, #218	; 0xda
+  401902:	2005      	movs	r0, #5
+  401904:	4b0c      	ldr	r3, [pc, #48]	; (401938 <ADC_Handler+0x228>)
+  401906:	4798      	blx	r3
 }
-  40190a:	e761      	b.n	4017d0 <ADC_Handler+0xc0>
+  401908:	e762      	b.n	4017d0 <ADC_Handler+0xc0>
+  40190a:	bf00      	nop
   40190c:	f3af 8000 	nop.w
   401910:	3cf2cf96 	.word	0x3cf2cf96
   401914:	3fcb3bb8 	.word	0x3fcb3bb8
