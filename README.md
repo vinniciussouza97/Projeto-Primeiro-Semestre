@@ -1,7 +1,9 @@
 # Projeto-Primeiro-Semestre
 
 César Abraham Flores Cisneros Filho, 14.00800-9
+
 Guilherme Mucciolo Davanço, 15.00020-6
+
 Vinnicius Bernacchi de Souza, 15.00437-6
 
 Nesse projeto, construiremos um vaso inteligente capaz de automaticamente regar a planta quando a umidade da terra estiver baixa
