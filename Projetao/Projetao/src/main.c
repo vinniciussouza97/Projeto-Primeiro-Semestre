@@ -118,7 +118,7 @@ void ADC_Handler(void)
 		
 		//exibição do último valor
 		char buffer[30];
-		sprintf (buffer, "LDR: %d", result);
+		sprintf (buffer, "LDR: %d\r", result);
 		puts(buffer);
 		
 		//Print no LCD
@@ -132,7 +132,7 @@ void ADC_Handler(void)
 			escuro -= tempo_entre_medicoes;
 		else
 			escuro = escuro_max;
-		sprintf (buffer, "Escuro: %d", escuro);
+		sprintf (buffer, "Escuro: %d\r", escuro);
 		puts(buffer);
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(0, 171, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
@@ -156,7 +156,7 @@ void ADC_Handler(void)
 		result = adc_get_channel_value(ADC, ADC_CHANNEL_UMIDADE);
 		
 		char buffer[30];
-		sprintf (buffer, "Umidade: %d", result);
+		sprintf (buffer, "Umidade: %d\r", result);
 		puts(buffer);
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(0, 192, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
@@ -194,7 +194,7 @@ void ADC_Handler(void)
 		//Cálculo da temperatura atual, vide Datasheet
 		float	temp = (float)(result*VOLT_REF/MAX_DIGITAL - 1440) * 0.21276 + 27.0;
 		char buffer[30];
-		sprintf(buffer, "Temperatura: %.1f", temp);
+		sprintf(buffer, "Temperatura: %.1f\r", temp);
 		puts(buffer);
 		ili93xx_set_foreground_color(COLOR_WHITE);
 		ili93xx_draw_filled_rectangle(0, 213, ILI93XX_LCD_WIDTH, ILI93XX_LCD_HEIGHT);
@@ -210,7 +210,7 @@ void configuracoes_gerais()
 	puts("Insira tempo maximo no escuro em horas:\r");
 	escuro_max = getchar();
 	escuro_max -= 48;
-	escuro_max *= 3600;
+//	escuro_max *= 3600;
 	escuro = escuro_max;
 	puts("Insira a luminosidade minima em \%:\r");
 	luz_min = getchar();
@@ -219,7 +219,7 @@ void configuracoes_gerais()
 	puts("Insira o tempo maximo com a luz acesa em horas\r");
 	max_aceso = getchar();
 	max_aceso -= 48;
-	max_aceso *= 3600;
+//	max_aceso *= 3600;
 	puts("Configuracao completa!\r");
 	sprintf(buffer,"Tempo: %i\tLuz: %i\%\tAceso: %i\n\r", escuro_max, luz_min, max_aceso);
 	puts(buffer);
